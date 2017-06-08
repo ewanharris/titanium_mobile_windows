@@ -95,4 +95,18 @@ describe('Ti.UI.SearchBar', function () {
 		});
 		win.open();
 	});
+
+	it('Should be able to set/set hintText', function (finish) {
+	    var search = Ti.UI.createSearchBar({
+	        hintText: 'Search'
+	    });
+	    should(search.hintText).eql('Search');
+	    should(search.getHintText()).eql('Search');
+	    should(function() {
+	        search.setHintText('Updated search');
+	    }).not.throw();
+	    should(search.hintText).eql('Updated search');
+	    should(search.getHintText()).eql('Updated search');
+	    finish();
+	})
 });

@@ -52,6 +52,10 @@ namespace TitaniumWindows
 			virtual std::string get_value() const TITANIUM_NOEXCEPT override;
 			virtual void set_value(const std::string&) TITANIUM_NOEXCEPT override;
 
+			virtual void set_hintText(const std::string&) TITANIUM_NOEXCEPT override;
+			virtual std::string get_hintText() const TITANIUM_NOEXCEPT override;
+
+
 		private:
 			Windows::UI::Xaml::Controls::Border^ border__;
 #if defined(IS_WINDOWS_PHONE) || defined(IS_WINDOWS_10)

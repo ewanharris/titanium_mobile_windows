@@ -118,5 +118,15 @@ namespace TitaniumWindows
 #endif
 		}
 
+		void SearchBar::set_hintText(const std::string& hintText) TITANIUM_NOEXCEPT
+		{
+			Titanium::UI::SearchBar::set_hintText(hintText);
+			suggest_box__->PlaceholderText = TitaniumWindows::Utility::ConvertUTF8String(hintText);
+		}
+
+		std::string SearchBar::get_hintText() const TITANIUM_NOEXCEPT
+		{
+			return TitaniumWindows::Utility::ConvertUTF8String(suggest_box__->PlaceholderText);
+		}
 	}  // namespace UI
 }  // namespace TitaniumWindows
