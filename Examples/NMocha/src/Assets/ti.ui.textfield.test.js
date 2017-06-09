@@ -94,6 +94,23 @@ describe('Titanium.UI.TextField', function () {
 	// selection
 	// suppressReturn
 
+
+	it.only("hinttextid", function (finish) {
+	    var tf = Ti.UI.createTextField({
+	        hinttextid: "this is my key"
+	    });
+	    should(tf.hinttextid).be.a.String;
+	    should(tf.getHinttextid).be.a.Function;
+	    should(tf.hinttextid).eql('this is my key');
+	    should(tf.getHinttextid()).eql('this is my key');
+	    should(tf.hintText).eql('this is my value');
+	    tf.hinttextid = 'other text';
+	    should(tf.hinttextid).eql('other text');
+	    should(tf.getHinttextid()).eql('other text');
+	    should(tf.hintText).eql('this is my value'); // should retain old value if can't find key
+	    finish();
+	});
+
 	it.skip('width', function (finish) {
 		this.timeout(5000);
 		var textfield = Ti.UI.createTextField({

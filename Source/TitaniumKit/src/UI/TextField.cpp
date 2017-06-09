@@ -9,6 +9,7 @@
 #include "Titanium/UI/TextField.hpp"
 #include "Titanium/detail/TiImpl.hpp"
 #include "Titanium/UI/AttributedString.hpp"
+#include "Titanium/Locale.hpp"
 #include <type_traits>
 
 namespace Titanium
@@ -58,6 +59,16 @@ namespace Titanium
 		TITANIUM_PROPERTY_READWRITE(TextField, std::shared_ptr<AttributedString>, attributedHintString)
 		TITANIUM_PROPERTY_READWRITE(TextField, std::shared_ptr<AttributedString>, attributedString)
 
+		TITANIUM_PROPERTY_READ(TextField, std::string, hinttextid)
+		void TextField::set_hinttextid(const std::string& hinttextid) TITANIUM_NOEXCEPT
+		{
+			hinttextid__ = hinttextid;
+			const auto value = Titanium::Locale::GetString(get_context(), hinttextid);
+			if (value) {
+				set_hintText(*value);
+			}
+		}
+
 		void TextField::blur() TITANIUM_NOEXCEPT
 		{
 			TITANIUM_LOG_DEBUG("TextField::blur");
@@ -89,6 +100,7 @@ namespace Titanium
 			TITANIUM_ADD_PROPERTY(TextField, ellipsize);
 			TITANIUM_ADD_PROPERTY(TextField, enableReturnKey);
 			TITANIUM_ADD_PROPERTY(TextField, font);
+			TITANIUM_ADD_PROPERTY(TextField, hinttextid);
 			TITANIUM_ADD_PROPERTY(TextField, hintText);
 			TITANIUM_ADD_PROPERTY(TextField, keyboardType);
 			TITANIUM_ADD_PROPERTY(TextField, leftButtonMode);
@@ -125,6 +137,8 @@ namespace Titanium
 			TITANIUM_ADD_FUNCTION(TextField, setEnableReturnKey);
 			TITANIUM_ADD_FUNCTION(TextField, getFont);
 			TITANIUM_ADD_FUNCTION(TextField, setFont);
+			TITANIUM_ADD_FUNCTION(TextField, getHinttextid);
+			TITANIUM_ADD_FUNCTION(TextField, setHinttextid);
 			TITANIUM_ADD_FUNCTION(TextField, getHintText);
 			TITANIUM_ADD_FUNCTION(TextField, setHintText);
 			TITANIUM_ADD_FUNCTION(TextField, getKeyboardType);
@@ -246,6 +260,12 @@ namespace Titanium
 
 		TITANIUM_FUNCTION_AS_GETTER(TextField, getFont, font)
 		TITANIUM_FUNCTION_AS_SETTER(TextField, setFont, font)
+
+		TITANIUM_PROPERTY_GETTER_STRING(TextField, hinttextid)
+		TITANIUM_PROPERTY_SETTER_STRING(TextField, hinttextid)
+
+		TITANIUM_FUNCTION_AS_GETTER(TextField, getHinttextid, hinttextid)
+		TITANIUM_FUNCTION_AS_SETTER(TextField, setHinttextid, hinttextid)
 
 		TITANIUM_PROPERTY_GETTER_STRING(TextField, hintText)
 		TITANIUM_PROPERTY_SETTER_STRING(TextField, hintText)
