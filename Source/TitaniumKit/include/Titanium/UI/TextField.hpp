@@ -125,6 +125,16 @@ namespace Titanium
 			TITANIUM_PROPERTY_IMPL_DEF(Font, font);
 
 			/*!
+			@method
+
+			@abstract hinttextid : String
+
+			@discussion Key identifying a string from the locale file to use for the TextField hintText.
+
+			*/
+			TITANIUM_PROPERTY_IMPL_DEF(std::string, hinttextid);
+
+			/*!
 			  @method
 
 			  @abstract hintText : String
@@ -335,6 +345,10 @@ namespace Titanium
 			TITANIUM_FUNCTION_DEF(getFont);
 			TITANIUM_FUNCTION_DEF(setFont);
 
+			TITANIUM_PROPERTY_DEF(hinttextid);
+			TITANIUM_FUNCTION_DEF(getHinttextid);
+			TITANIUM_FUNCTION_DEF(setHinttextid);
+
 			TITANIUM_PROPERTY_DEF(hintText);
 			TITANIUM_FUNCTION_DEF(getHintText);
 			TITANIUM_FUNCTION_DEF(setHintText);
@@ -396,6 +410,7 @@ namespace Titanium
 			bool ellipsize__;
 			bool enableReturnKey__;
 			Font font__;
+			std::string hinttextid__;
 			std::string hintText__;
 			KEYBOARD keyboardType__;
 			INPUT_BUTTONMODE leftButtonMode__;
