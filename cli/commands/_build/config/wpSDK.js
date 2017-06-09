@@ -19,9 +19,10 @@ module.exports = function configOptionSDK(order) {
 				sdkTargets.push(version);
 			}
 		}
+		if (this.windowsInfo.windowsphone && this.windowsInfo.windowsphone[version]) {
+			sdkTargets = sdkTargets.concat(this.windowsInfo.windowsphone[version].sdks);
+		}
 	}
-
-	sdkTargets = sdkTargets.concat(this.windowsInfo.windowsphone[version].sdks);
 
 	function isWindows10(wpsdk) {
 		return (wpsdk && wpsdk.startsWith && wpsdk.startsWith('10.0'));
