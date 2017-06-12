@@ -95,7 +95,7 @@ describe('Titanium.UI.TextField', function () {
 	// suppressReturn
 
 
-	it.only("hinttextid", function (finish) {
+	it("hinttextid", function (finish) {
 	    var tf = Ti.UI.createTextField({
 	        hinttextid: "this is my key"
 	    });

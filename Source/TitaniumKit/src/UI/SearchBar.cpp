@@ -8,6 +8,7 @@
 
 #include "Titanium/UI/SearchBar.hpp"
 #include "Titanium/UI/TableViewRow.hpp"
+#include "Titanium/Locale.hpp"
 
 namespace Titanium
 {
@@ -36,7 +37,6 @@ namespace Titanium
 		TITANIUM_PROPERTY_READWRITE(SearchBar, bool, autocorrect)
 		TITANIUM_PROPERTY_READWRITE(SearchBar, std::string, barColor)
 		TITANIUM_PROPERTY_READWRITE(SearchBar, std::string, hintText)
-		TITANIUM_PROPERTY_READWRITE(SearchBar, std::string, hinttextid)
 		TITANIUM_PROPERTY_READWRITE(SearchBar, KEYBOARD, keyboardType)
 		TITANIUM_PROPERTY_READWRITE(SearchBar, KEYBOARD_APPEARANCE, keyboardAppearance)
 		TITANIUM_PROPERTY_READWRITE(SearchBar, std::string, prompt)
@@ -46,6 +46,16 @@ namespace Titanium
 		TITANIUM_PROPERTY_READWRITE(SearchBar, std::string, value)
 		TITANIUM_PROPERTY_READWRITE(SearchBar, std::function<void(const std::string&)>, querySubmitted)
 		TITANIUM_PROPERTY_READWRITE(SearchBar, std::function<std::vector<std::string>(const std::string&)>, suggestionRequested)
+
+		TITANIUM_PROPERTY_READ(SearchBar, std::string, hinttextid)
+		void SearchBar::set_hinttextid(const std::string& hinttextid) TITANIUM_NOEXCEPT
+		{
+			hinttextid__ = hinttextid;
+			const auto value = Titanium::Locale::GetString(get_context(), hinttextid);
+			if (value) {
+				set_hintText(*value);
+			}
+		}
 
 		void SearchBar::JSExportInitialize()
 		{
