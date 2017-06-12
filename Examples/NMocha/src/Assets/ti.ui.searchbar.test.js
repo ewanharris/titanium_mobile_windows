@@ -102,11 +102,27 @@ describe('Ti.UI.SearchBar', function () {
 	    });
 	    should(search.hintText).eql('Search');
 	    should(search.getHintText()).eql('Search');
-	    should(function() {
+	    should(function () {
 	        search.setHintText('Updated search');
 	    }).not.throw();
 	    should(search.hintText).eql('Updated search');
 	    should(search.getHintText()).eql('Updated search');
 	    finish();
-	})
+	});
+
+	it("hinttextid", function (finish) {
+	    var search = Ti.UI.createSearchBar({
+	        hinttextid: "this is my key"
+	    });
+	    should(search.hinttextid).be.a.String;
+	    should(search.getHinttextid).be.a.Function;
+	    should(search.hinttextid).eql('this is my key');
+	    should(search.getHinttextid()).eql('this is my key');
+	    should(search.hintText).eql('this is my value');
+	    search.hinttextid = 'other text';
+	    should(search.hinttextid).eql('other text');
+	    should(search.getHinttextid()).eql('other text');
+	    should(search.hintText).eql('this is my value'); // should retain old value if can't find key
+	    finish();
+	});
 });
