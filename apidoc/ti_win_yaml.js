@@ -7,9 +7,96 @@ var path = require('path'),
 	fs   = require('fs.extra'),
 	_    = require('underscore'),
 	LineReader = require('line-by-line'),
+	path = require('path'),
 	titaniumKit = {},
 	windowsTitaniumKit = {},         // Stores what's implemented in Titanium Windows
 	windowsTitaniumKit_Missing = []; // Stores missing module names
+
+var util = require('util')
+
+// FIXME: We could populate this while reading in the files, but it would
+// require changes to how we read in, his isnt the nicest, but works for now
+var APIS = [
+	'2DMatrix',
+	'API',
+	'Accelerometer',
+	'ActivityIndicator',
+	'ActivityIndicatorStyle',
+	'AlertDialog',
+	'Analytics',
+	'Animation',
+	'Annotation',
+	'App',
+	'AttributedString',
+	'AudioPlayer',
+	'AudioRecorder',
+	'Blob',
+	'BlobStream',
+	'Buffer',
+	'BufferStream',
+	'Button',
+	'Camera',
+	'Clipboard',
+	'Codec',
+	'Contacts',
+	'Cookie',
+	'Database',
+	'EmailDialog',
+	'File',
+	'FileStream',
+	'Filesystem',
+	'Geolocation',
+	'Gesture',
+	'Group',
+	'HTTPClient',
+	'IOStream',
+	'ImageView',
+	'Item',
+	'Label',
+	'ListSection',
+	'ListView',
+	'Locale',
+	'Map',
+	'Media',
+	'MusicPlayer',
+	'Network',
+	'Notification',
+	'OptionDialog',
+	'Person',
+	'Picker',
+	'PickerColumn',
+	'PickerRow',
+	'Platform',
+	'ProgressBar',
+	'Properties',
+	'Route',
+	'ScrollView',
+	'ScrollableView',
+	'SearchBar',
+	'Slider',
+	'Sound',
+	'Stream',
+	'Switch',
+	'TCP',
+	'Tab',
+	'TabGroup',
+	'TableView',
+	'TableViewRow',
+	'TableViewSection',
+	'TextArea',
+	'TextField',
+	'UDP',
+	'UI',
+	'Utils',
+	'VideoPlayer',
+	'View',
+	'View',
+	'WebView',
+	'Window',
+	'XML'
+];
+
+var APIs = [];
 
 String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);
@@ -22,7 +109,7 @@ function extract(callback) {
 	var walker = fs.walk(path.join(__dirname, '../Source/TitaniumKit/src'));
 	walker.on('file',
 		function (root, stat, next) {
-			if (/\.cpp$/.test(stat.name)) {
+			if (/\.cpp$/.test(stat.name)) {;
 			    extractTitaniumKit(root, stat.name, next);
 			} else {
 				next();
@@ -45,6 +132,7 @@ function extractTitaniumKit(root, file, next) {
 		var unknown_match   = line.match(/\s*\:\s*Module\(js_context,\s*apiName\)/);
 		var property_match  = line.match(/TITANIUM_ADD_PROPERTY\w*\((\w+),\s*(\w+)\);/);
 		var function_match  = line.match(/TITANIUM_ADD_FUNCTION\((\w+),\s*(\w+)\);/);
+		var constant_match  = line.match(/TITANIUM_ADD_CONSTANT_PROPERTY\w*\((\w+),\s*(\w+)\);/)
 
 		if (namespace_match) {
 			module_name = namespace_match[1];
@@ -71,6 +159,9 @@ function extractTitaniumKit(root, file, next) {
 		}
 		if (function_match && function_match[2][0] != '_') {
 			methods.push(function_match[2]);
+		}
+		if (constant_match && !APIS.includes(constant_match[2])) {
+			properties.push(constant_match[2]);
 		}
 	});
 	reader.on('error', function(err) {
@@ -210,7 +301,6 @@ function extractWindowsKit(callback) {
 	);
 	walker.on('end', callback);
 }
-
 //
 // Export API document to YAML
 //
