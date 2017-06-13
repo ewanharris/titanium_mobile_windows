@@ -157,7 +157,7 @@ function extractTitaniumKit(root, file, next) {
 		if (function_match && function_match[2][0] != '_') {
 			methods.push(function_match[2]);
 		}
-		if (constant_match && !APIS.includes(constant_match[2])) {
+		if (constant_match && APIS.indexOf(constant_match[2]) === -1) {
 			properties.push(constant_match[2]);
 		}
 	});
