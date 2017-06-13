@@ -293,6 +293,10 @@ methods:
       notes: Use <Titanium.Media.requestAudioRecorderPermissions> instead.
   - name: requestAudioRecorderPermissions
     platforms: [windowsphone]
+  - name: hasCameraPermissions
+    platforms: [windowsphone]
+  - name: requestCameraPermissions
+    platforms: [windowsphone]
   - name: createAudioPlayer
     platforms: [windowsphone]
   - name: createAudioRecorder
@@ -343,4 +347,3 @@ methods:
     platforms: [windowsphone]
   - name: getVolume
     platforms: [windowsphone]
-

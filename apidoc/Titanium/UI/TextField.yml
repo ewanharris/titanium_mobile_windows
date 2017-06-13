@@ -7,6 +7,8 @@ properties:
     platforms: [windowsphone]
   - name: editable
     platforms: [windowsphone]
+  - name: font
+    platforms: [windowsphone]
   - name: hintText
     platforms: [windowsphone]
   - name: keyboardType
@@ -37,6 +39,10 @@ methods:
   - name: getEditable
     platforms: [windowsphone]
   - name: setEditable
+    platforms: [windowsphone]
+  - name: getFont
+    platforms: [windowsphone]
+  - name: setFont
     platforms: [windowsphone]
   - name: getHintText
     platforms: [windowsphone]
