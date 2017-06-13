@@ -12,7 +12,6 @@ var path = require('path'),
 	windowsTitaniumKit = {},         // Stores what's implemented in Titanium Windows
 	windowsTitaniumKit_Missing = []; // Stores missing module names
 
-var util = require('util')
 
 // FIXME: We could populate this while reading in the files, but it would
 // require changes to how we read in, his isnt the nicest, but works for now
@@ -96,8 +95,6 @@ var APIS = [
 	'XML'
 ];
 
-var APIs = [];
-
 String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);
 };
@@ -109,7 +106,7 @@ function extract(callback) {
 	var walker = fs.walk(path.join(__dirname, '../Source/TitaniumKit/src'));
 	walker.on('file',
 		function (root, stat, next) {
-			if (/\.cpp$/.test(stat.name)) {;
+			if (/\.cpp$/.test(stat.name)) {
 			    extractTitaniumKit(root, stat.name, next);
 			} else {
 				next();
