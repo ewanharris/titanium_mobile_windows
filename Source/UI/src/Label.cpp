@@ -34,7 +34,7 @@ namespace TitaniumWindows
 			TITANIUM_LOG_DEBUG("Label::ctor ", this);
 		}
 
-		Label::~Label() 
+		Label::~Label()
 		{
 			TITANIUM_LOG_DEBUG("Label::dtor ", this);
 		}
@@ -42,7 +42,7 @@ namespace TitaniumWindows
 		void Label::postCallAsConstructor(const JSContext& js_context, const std::vector<JSValue>& arguments)
 		{
 			Titanium::UI::Label::postCallAsConstructor(js_context, arguments);
-			
+
 			// Note: TextAlignment and VerticalAlignment does not work without parent container!
 			border__ = ref new Controls::Border();
 			label__ = ref new Windows::UI::Xaml::Controls::TextBlock();
@@ -55,14 +55,33 @@ namespace TitaniumWindows
 			label__->FontSize = DefaultFontSize;
 
 			// TIMOB-19048: max size is set to screen size by default
-			border__->SizeChanged += ref new Windows::UI::Xaml::SizeChangedEventHandler([this](Platform::Object^, Windows::UI::Xaml::SizeChangedEventArgs^) {
-				const auto current = Windows::UI::Xaml::Window::Current;
-				if (current) {
-					label__->MaxWidth  = current->Bounds.Width;
-					label__->MaxHeight = current->Bounds.Height;
+			const auto current = Windows::UI::Xaml::Window::Current;
+			if (current) {
+				label__->MaxWidth = current->Bounds.Width;
+				label__->MaxHeight = current->Bounds.Height;
+			}
+
+			border__->SizeChanged += ref new Windows::UI::Xaml::SizeChangedEventHandler([this](Platform::Object^, Windows::UI::Xaml::SizeChangedEventArgs^ e) {
+				try {
+					if (border__->Parent) {
+						const auto panel = dynamic_cast<FrameworkElement^>(border__->Parent);
+						if (panel) {
+							const auto width  = panel->ActualWidth;
+							const auto height = panel->ActualHeight;
+							if (width > 0) {
+								label__->MaxWidth = width;
+							}
+							if (height > 0) {
+								label__->MaxHeight = height;
+							}
+						}
+					}
+
 					if (propertiesSet__) {
 						measureDesiredSize();
 					}
+				} catch (...) {
+					TITANIUM_LOG_DEBUG("Unknown error at Label::SizeChanged");
 				}
 			});
 
@@ -166,10 +185,10 @@ namespace TitaniumWindows
 			const auto height = layout->get_height();
 			const auto TI_UI_SIZE = Titanium::UI::Constants::to_string(Titanium::UI::LAYOUT::SIZE);
 			if (width.empty() || width == TI_UI_SIZE) {
-				border__->Width = label__->DesiredSize.Width;
+				border__->Width = label__->DesiredSize.Width + 1; // Border needs this margin
 			}
 			if (height.empty() || height == TI_UI_SIZE) {
-				border__->Height = label__->DesiredSize.Height;
+				border__->Height = label__->DesiredSize.Height + 1; // Border needs this margin
 			}
 		}
 
@@ -303,11 +322,11 @@ namespace TitaniumWindows
 						for (const auto attribute : styles.at(pos)) {
 							const auto attribute_styles = Titanium::UI::Constants::to_ATTRIBUTE_STYLE(static_cast<std::underlying_type<Titanium::UI::ATTRIBUTE_STYLE>::type>(attribute.value));
 							switch (attribute.type) {
-							case Titanium::UI::ATTRIBUTE_TYPE::FOREGROUND_COLOR: 
+							case Titanium::UI::ATTRIBUTE_TYPE::FOREGROUND_COLOR:
 								span->Foreground = ref new Windows::UI::Xaml::Media::SolidColorBrush(
 									WindowsViewLayoutDelegate::ColorForName(static_cast<std::string>(attribute.value)));
 								break;
-							case Titanium::UI::ATTRIBUTE_TYPE::FONT: 
+							case Titanium::UI::ATTRIBUTE_TYPE::FONT:
 							{
 								const auto font = Titanium::UI::js_to_Font(static_cast<JSObject>(attribute.value));
 								TitaniumWindows::UI::ViewHelper::SetFont<Windows::UI::Xaml::Documents::Span^>(get_context(), span, font);
