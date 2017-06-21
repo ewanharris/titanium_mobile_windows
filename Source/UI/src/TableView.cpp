@@ -139,6 +139,7 @@ namespace TitaniumWindows
 			for (const auto section : model__->get_sections()) {
 				unregisterSectionLayoutNode(section);
 			}
+			collectionViewItems__->Clear();
 		}
 
 		void TableView::setTableHeader()
