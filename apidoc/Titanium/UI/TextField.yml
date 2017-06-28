@@ -9,6 +9,8 @@ properties:
     platforms: [windowsphone]
   - name: font
     platforms: [windowsphone]
+  - name: hinttextid
+    platforms: [windowsphone]
   - name: hintText
     platforms: [windowsphone]
   - name: keyboardType
@@ -43,6 +45,10 @@ methods:
   - name: getFont
     platforms: [windowsphone]
   - name: setFont
+    platforms: [windowsphone]
+  - name: getHinttextid
+    platforms: [windowsphone]
+  - name: setHinttextid
     platforms: [windowsphone]
   - name: getHintText
     platforms: [windowsphone]

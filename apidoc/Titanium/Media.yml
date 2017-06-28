@@ -288,9 +288,6 @@ methods:
     platforms: [windowsphone]
   - name: requestAuthorization
     platforms: [windowsphone]
-    deprecated:
-      since: "6.1.0"
-      notes: Use <Titanium.Media.requestAudioRecorderPermissions> instead.
   - name: requestAudioRecorderPermissions
     platforms: [windowsphone]
   - name: hasCameraPermissions
@@ -347,3 +344,4 @@ methods:
     platforms: [windowsphone]
   - name: getVolume
     platforms: [windowsphone]
+
