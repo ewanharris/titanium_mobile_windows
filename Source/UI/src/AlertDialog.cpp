@@ -113,15 +113,10 @@ namespace TitaniumWindows
 
 		void AlertDialog::hide() TITANIUM_NOEXCEPT
 		{
-#if defined(IS_WINDOWS_10)
 			if (IS_WINDOWS_MOBILE) {
 				TITANIUM_MODULE_LOG_WARN("AlertDialog::hide() is not supported on Windows 10 Mobile");
 				return;
 			}
-#elif defined(IS_WINDOWS_PHONE)
-			TITANIUM_MODULE_LOG_WARN("AlertDialog::hide() is not supported on Windows Phone");
-			return;
-#endif
 			if (dialog_task__ != nullptr) {
 				dialog_task__->Cancel();
 				if (dialog_queue__.size() > 0) {

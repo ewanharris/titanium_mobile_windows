@@ -58,7 +58,7 @@ namespace TitaniumWindows
 			Windows::Foundation::IAsyncOperation<Windows::UI::Popups::IUICommand^>^ dialog_task__{nullptr};
 			std::function<void(Windows::UI::Popups::IUICommand^)> on_click__;
 
-#if defined(IS_WINDOWS_PHONE)
+#if defined(IS_WINDOWS_MOBILE)
 			static const std::uint32_t MaxButtonCount = 2;
 #else
 			static const std::uint32_t MaxButtonCount = 3;

@@ -1850,7 +1850,6 @@ namespace TitaniumWindows
 		{
 			auto info = Windows::Graphics::Display::DisplayInformation::GetForCurrentView();
 			double ppi = info->LogicalDpi;
-#if defined(IS_WINDOWS_PHONE) || defined(IS_WINDOWS_10)
 			switch (name) {
 			case Titanium::LayoutEngine::ValueName::CenterX:
 			case Titanium::LayoutEngine::ValueName::Left:
@@ -1867,7 +1866,6 @@ namespace TitaniumWindows
 				ppi = info->RawDpiY / info->RawPixelsPerViewPixel;
 				break;
 			}
-#endif
 			return ppi;
 		}
 

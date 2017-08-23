@@ -45,7 +45,7 @@ namespace TitaniumWindows
 			// Don't set Border to Xaml Frame content, otherwise you'll see runtime exception.
 			getViewLayoutDelegate<WindowsViewLayoutDelegate>()->setComponent(canvas__, nullptr, false);
 
-#if defined(IS_WINDOWS_10)
+
 			const auto rootFrame = dynamic_cast<Windows::UI::Xaml::Controls::Frame^>(Windows::UI::Xaml::Window::Current->Content);
 			rootFrame->Navigated += ref new Windows::UI::Xaml::Navigation::NavigatedEventHandler([this](Platform::Object^, Windows::UI::Xaml::Navigation::NavigationEventArgs^) {
 				try {
@@ -74,18 +74,12 @@ namespace TitaniumWindows
 					TITANIUM_LOG_DEBUG("Error at root frame SizeChanged");
 				}
 			});
-#endif
 
-#if defined(IS_WINDOWS_10) || defined(IS_WINDOWS_PHONE)
 			// Setup back button press event
 			static std::once_flag of;
 			std::call_once(of, [this]() {
-#if defined(IS_WINDOWS_10)
+
 				SystemNavigationManager::GetForCurrentView()->BackRequested += ref new EventHandler<BackRequestedEventArgs^>([](Platform::Object^ sender, BackRequestedEventArgs^ e) {
-#elif defined(IS_WINDOWS_PHONE)
-				using namespace Windows::Phone::UI::Input;
-				backpressed_event__ = HardwareButtons::BackPressed += ref new EventHandler<BackPressedEventArgs^>([](Platform::Object ^sender, BackPressedEventArgs ^e) {
-#endif
 					try {
 						if (TitaniumWindows::UI::Window::window_stack__.size() > 0) {
 							// Issue back event on the top window
@@ -103,19 +97,14 @@ namespace TitaniumWindows
 					}
 				});
 			});	
-#endif
+
 	}
 
 		Window::~Window() 
 		{
-#if defined(IS_WINDOWS_PHONE)
-			if (canvas__) {
-				Windows::Phone::UI::Input::HardwareButtons::BackPressed -= backpressed_event__;
-			}
-#endif
+
 		}
 
-#if !defined(IS_WINDOWS_PHONE)
 		void Window::set_title(const std::string& title) TITANIUM_NOEXCEPT
 		{
 			Titanium::UI::Window::set_title(title);
@@ -124,7 +113,6 @@ namespace TitaniumWindows
 				view->Title = TitaniumWindows::Utility::ConvertUTF8String(title);
 			}
 		}
-#endif
 
 		void Window::updateWindowsCommandBar(const std::shared_ptr<TitaniumWindows::UI::WindowsXaml::CommandBar>& commandbar)
 		{
@@ -316,7 +304,6 @@ namespace TitaniumWindows
 			Windows::UI::Xaml::Application::Current->Exit();
 		}
 
-#if defined(IS_WINDOWS_10)
 		void Window::updateWindowSize() TITANIUM_NOEXCEPT
 		{
 			const auto currentBounds = Windows::UI::Xaml::Window::Current->Bounds;
@@ -341,7 +328,6 @@ namespace TitaniumWindows
 				TITANIUM_LOG_WARN("Titanium::Window: Unable to resize root Window with size ", width, "x", height);
 			}
 		}
-#endif
 
 		void Window::open(const std::shared_ptr<Titanium::UI::OpenWindowParams>& params) TITANIUM_NOEXCEPT
 		{
@@ -467,10 +453,7 @@ namespace TitaniumWindows
 
 			// fullscreen works for active Window only
 			if (is_opened__) {
-#if defined(IS_WINDOWS_PHONE)
-				auto statusBar = Windows::UI::ViewManagement::StatusBar::GetForCurrentView();
-				fullscreen ? statusBar->HideAsync() : statusBar->ShowAsync();
-#elif defined(IS_WINDOWS_10)
+
 				auto view = Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
 				if (fullscreen) {
 					if (view->TryEnterFullScreenMode()) {
@@ -482,7 +465,6 @@ namespace TitaniumWindows
 					view->ExitFullScreenMode();
 					Windows::UI::ViewManagement::ApplicationView::PreferredLaunchWindowingMode = Windows::UI::ViewManagement::ApplicationViewWindowingMode::Auto;
 				}
-#endif
 			}
 		}
 

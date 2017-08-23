@@ -32,16 +32,11 @@ namespace TitaniumWindows
 
 		bool EmailDialog::isSupported() TITANIUM_NOEXCEPT
 		{
-#if defined(IS_WINDOWS_PHONE) || defined(IS_WINDOWS_10)
 			return true;
-#else
-			return false;
-#endif
 		}
 
 		void EmailDialog::open(const bool& animated) TITANIUM_NOEXCEPT
 		{
-#if defined(IS_WINDOWS_PHONE) || defined(IS_WINDOWS_10)
 			Windows::ApplicationModel::Email::EmailMessage^ email_message = ref new Windows::ApplicationModel::Email::EmailMessage();
 
 			// Set up all the fields!
@@ -66,9 +61,6 @@ namespace TitaniumWindows
 					this->fireEvent("complete", eventArgs);
 				});
 			}
-#else
-			TITANIUM_MODULE_LOG_WARN("EmailDialog not supported on Windows Store apps.");
-#endif
 		}
 
 		void EmailDialog::enableEvent(const std::string& event_name) TITANIUM_NOEXCEPT
@@ -83,7 +75,6 @@ namespace TitaniumWindows
 
 		// Common code for getting/setting recipients on To/Bcc/Cc
 
-#if defined(IS_WINDOWS_PHONE) || defined(IS_WINDOWS_10)
 		void EmailDialog::setRecipients(const std::vector<std::string>& arg, Windows::Foundation::Collections::IVector<Windows::ApplicationModel::Email::EmailRecipient^>^ recipients) {
 			// clear out an existing entries so we fully replace with new
 			recipients->Clear();
@@ -94,6 +85,5 @@ namespace TitaniumWindows
 				recipients->Append(emailRecipient); 
 			}
 		}
-#endif
 	}  // namespace UI
 }  // namespace TitaniumWindows

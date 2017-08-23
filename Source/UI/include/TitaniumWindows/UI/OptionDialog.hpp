@@ -52,7 +52,7 @@ namespace TitaniumWindows
 
 			virtual void show(const Titanium::UI::OptionDialogShowParams& params) TITANIUM_NOEXCEPT override;
 
-#if defined(IS_WINDOWS_PHONE)
+#if (IS_WINDOWS_MOBILE == 1)
 			static const std::uint32_t MaxButtonCount = 2;
 #else
 			static const std::uint32_t MaxButtonCount = 3;

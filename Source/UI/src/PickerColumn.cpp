@@ -50,27 +50,19 @@ namespace TitaniumWindows
 		{
 			Titanium::UI::PickerColumn::addRow(r);
 
-#if defined(IS_WINDOWS_PHONE)
-			refreshRows();
-#else
 			const auto row = std::dynamic_pointer_cast<TitaniumWindows::UI::PickerRow>(r);
 			picker__->Items->Append(row->getComboBoxItem());
-#endif
 		}
 
 		void PickerColumn::removeRow(const std::shared_ptr<Titanium::UI::PickerRow>& r) TITANIUM_NOEXCEPT
 		{
 			Titanium::UI::PickerColumn::removeRow(r);
 
-#if defined(IS_WINDOWS_PHONE)
-			refreshRows();
-#else
 			const auto row = std::dynamic_pointer_cast<TitaniumWindows::UI::PickerRow>(r);
 			std::uint32_t index;
 			if (picker__->Items->IndexOf(row->getComboBoxItem(), &index)) {
 				picker__->Items->RemoveAt(index);
 			}
-#endif
 		}
 
 		void PickerColumn::afterPropertiesSet() TITANIUM_NOEXCEPT
@@ -86,21 +78,6 @@ namespace TitaniumWindows
 				const auto row = std::dynamic_pointer_cast<TitaniumWindows::UI::PickerRow>(r);
 				picker__->Items->Append(row->getComboBoxItem());
 			}
-
-#if defined(IS_WINDOWS_PHONE)
-			//
-			// hack: force full screen selector for Windows Phone 8.1.
-			// We want to make Picker fullscreen because Xaml ComboBox can't be rendered through parent component.
-			//
-			// Force at least 6 items in the list. Append "empty" items when needed
-			//
-			const std::int32_t count = 6 - picker__->Items->Size;
-			for (std::int32_t i = 0; i < count; i++) {
-				const auto item = ref new Controls::ComboBoxItem();
-				item->Content = ref new Controls::TextBlock();
-				picker__->Items->Append(item);
-			}
-#endif
 		}
 
 		void PickerColumn::JSExportInitialize()

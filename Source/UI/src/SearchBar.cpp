@@ -34,7 +34,7 @@ namespace TitaniumWindows
 			TITANIUM_LOG_DEBUG("SearchBar::dtor");
 		}
 
-#if defined(IS_WINDOWS_10)
+
 		static TextBox^ GetTextBox(DependencyObject^ root)
 		{
 			const auto count = Media::VisualTreeHelper::GetChildrenCount(root);
@@ -70,18 +70,15 @@ namespace TitaniumWindows
 			delete_button_dirty__ = true; // indicate we need to use our hack
 			updateCancelButtonVisibility(show);
 		}
-#endif
 
 		void SearchBar::postCallAsConstructor(const JSContext& js_context, const std::vector<JSValue>& arguments) 
 		{
 			Titanium::UI::SearchBar::postCallAsConstructor(js_context, arguments);
 			border__ = ref new Windows::UI::Xaml::Controls::Border();
-#if defined(IS_WINDOWS_PHONE) || defined(IS_WINDOWS_10)
 			suggest_box__  = ref new AutoSuggestBox();
 			suggestItems__ = ref new Platform::Collections::Vector<Platform::String^>();
 			suggest_box__->ItemsSource = suggestItems__;
 			suggest_box__->VerticalAlignment = Windows::UI::Xaml::VerticalAlignment::Center;
-#if defined(IS_WINDOWS_10)
 			suggest_box__->QueryIcon = ref new SymbolIcon(Symbol::Find);
 
 			// Since VisualTreeHelper is only available after Loaded event is fired, we need to update the visual state then.
@@ -120,11 +117,10 @@ namespace TitaniumWindows
 			suggest_box__->GotFocus += ref new Windows::UI::Xaml::RoutedEventHandler([this](Platform::Object^, RoutedEventArgs^) {
 				updateCancelButtonVisibility(get_showCancel());
 			});
-#endif
+
 			suggest_box__->KeyUp += ref new KeyEventHandler([this](Platform::Object^ sender, KeyRoutedEventArgs^ e) {
-#if defined(IS_WINDOWS_10)
+
 				updateCancelButtonVisibility(get_showCancel());
-#endif
 				if (e->Key == Windows::System::VirtualKey::Enter && querySubmitted__) {
 					querySubmitted__(TitaniumWindows::Utility::ConvertString(suggest_box__->Text));
 				}
@@ -175,23 +171,6 @@ namespace TitaniumWindows
 				}
 			});
 
-#else
-			// For Windows 8.1 Store App. Note that SearchBox is deprecated as of Windows 10.
-			suggest_box__ = ref new SearchBox();
-			suggest_box__->QuerySubmitted += ref new TypedEventHandler<SearchBox^, SearchBoxQuerySubmittedEventArgs^>([this](SearchBox^ sender, SearchBoxQuerySubmittedEventArgs^ e){
-				if (querySubmitted__) {
-					querySubmitted__(TitaniumWindows::Utility::ConvertString(sender->QueryText));
-				}
-			});
-			suggest_box__->SuggestionsRequested += ref new TypedEventHandler<SearchBox^, SearchBoxSuggestionsRequestedEventArgs^>([this](SearchBox^ sender, SearchBoxSuggestionsRequestedEventArgs^ e){
-				if (!sender->QueryText->IsEmpty() && suggestionRequested__) {
-					const auto items = suggestionRequested__(TitaniumWindows::Utility::ConvertString(sender->QueryText));
-					for (const auto item : items) {
-						e->Request->SearchSuggestionCollection->AppendQuerySuggestion(TitaniumWindows::Utility::ConvertString(item));
-					}
-				}
-			});
-#endif
 			border__->Child = suggest_box__;
 			Titanium::UI::SearchBar::setLayoutDelegate<WindowsViewLayoutDelegate>();
 			const auto layout = getViewLayoutDelegate<WindowsViewLayoutDelegate>();
@@ -207,21 +186,14 @@ namespace TitaniumWindows
 
 		std::string SearchBar::get_value() const TITANIUM_NOEXCEPT
 		{
-#if defined(IS_WINDOWS_PHONE) || defined(IS_WINDOWS_10)
+
 			return TitaniumWindows::Utility::ConvertUTF8String(suggest_box__->Text);
-#else
-			return TitaniumWindows::Utility::ConvertUTF8String(suggest_box__->QueryText);
-#endif
 		}
 
 		void SearchBar::set_value(const std::string& value) TITANIUM_NOEXCEPT
 		{
 			Titanium::UI::SearchBar::set_value(value);
-#if defined(IS_WINDOWS_PHONE) || defined(IS_WINDOWS_10)
 			suggest_box__->Text = TitaniumWindows::Utility::ConvertUTF8String(value);
-#else
-			suggest_box__->QueryText = TitaniumWindows::Utility::ConvertUTF8String(value);
-#endif
 		}
 
 		void SearchBar::set_hintText(const std::string& hintText) TITANIUM_NOEXCEPT
