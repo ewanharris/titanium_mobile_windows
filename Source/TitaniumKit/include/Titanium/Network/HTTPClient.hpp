@@ -253,6 +253,13 @@ namespace Titanium
 			*/
 			virtual void setRequestHeader(const std::string& key, const std::string& value) TITANIUM_NOEXCEPT;
 
+			/*!
+			  @method
+			  @abstract _waitForResponse
+			  @discussion Wait for response for the request. Blocks until server responses.
+			*/
+			virtual void _waitForResponse() TITANIUM_NOEXCEPT;
+
 			HTTPClient(const JSContext&) TITANIUM_NOEXCEPT;
 
 			virtual ~HTTPClient() = default;
@@ -354,6 +361,7 @@ namespace Titanium
 			TITANIUM_FUNCTION_DEF(setUsername);
 			TITANIUM_FUNCTION_DEF(setValidatesSecureCertificate);
 			TITANIUM_FUNCTION_DEF(setWithCredentials);
+			TITANIUM_FUNCTION_DEF(_waitForResponse);
 
 			/////// slots
 			void ondatastream(const double progress) TITANIUM_NOEXCEPT;
