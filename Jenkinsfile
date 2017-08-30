@@ -1,7 +1,7 @@
 #!groovy​
 
 def gitCommit = ''
-def testTimeout = 20
+def testTimeout = 25
 
 def build(sdkVersion, msBuildVersion, architecture, gitCommit) {
 	unstash 'sources' // for build
