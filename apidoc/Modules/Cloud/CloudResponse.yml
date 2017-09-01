@@ -1,0 +1,20 @@
+---
+name: CloudResponse
+properties:
+  - name: success
+    platforms:
+      - windowsphone
+  - name: error
+    platforms:
+      - windowsphone
+  - name: meta
+    platforms:
+      - windowsphone
+  - name: code
+    platforms:
+      - windowsphone
+  - name: message
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone

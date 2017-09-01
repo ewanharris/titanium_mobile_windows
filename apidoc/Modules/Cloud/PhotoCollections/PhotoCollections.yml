@@ -1,0 +1,42 @@
+---
+name: Modules.Cloud.PhotoCollections
+methods:
+  - name: create
+    platforms:
+      - windowsphone
+  - name: remove
+    platforms:
+      - windowsphone
+  - name: search
+    platforms:
+      - windowsphone
+  - name: show
+    platforms:
+      - windowsphone
+  - name: showPhotos
+    platforms:
+      - windowsphone
+  - name: showSubCollections
+    platforms:
+      - windowsphone
+  - name: update
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone
+---
+name: CloudPhotoCollectionsResponse
+properties:
+  - name: collections
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone
+---
+name: CloudPhotoCollectionsPhotosResponse
+properties:
+  - name: photos
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone

@@ -1,0 +1,36 @@
+---
+name: Modules.Cloud.Friends
+methods:
+  - name: add
+    platforms:
+      - windowsphone
+  - name: requests
+    platforms:
+      - windowsphone
+  - name: approve
+    platforms:
+      - windowsphone
+  - name: remove
+    platforms:
+      - windowsphone
+  - name: search
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone
+---
+name: CloudFriendsResponse
+properties:
+  - name: users
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone
+---
+name: CloudFriendRequestsResponse
+properties:
+  - name: friend_requests
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone

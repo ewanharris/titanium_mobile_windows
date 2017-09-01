@@ -1,0 +1,48 @@
+---
+name: Modules.Cloud.Events
+methods:
+  - name: create
+    platforms:
+      - windowsphone
+  - name: show
+    platforms:
+      - windowsphone
+  - name: showOccurrences
+    platforms:
+      - windowsphone
+  - name: query
+    platforms:
+      - windowsphone
+  - name: queryOccurrences
+    platforms:
+      - windowsphone
+  - name: search
+    platforms:
+      - windowsphone
+  - name: searchOccurrences
+    platforms:
+      - windowsphone
+  - name: remove
+    platforms:
+      - windowsphone
+  - name: update
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone
+---
+name: CloudEventsResponse
+properties:
+  - name: events
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone
+---
+name: CloudEventOccurrencesResponse
+properties:
+  - name: event_occurrences
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone

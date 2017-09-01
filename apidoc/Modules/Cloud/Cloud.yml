@@ -1,0 +1,50 @@
+---
+name: Modules.Cloud
+methods:
+  - name: hasStoredSession
+    platforms:
+      - windowsphone
+  - name: retrieveStoredSession
+    platforms:
+      - windowsphone
+  - name: sendRequest
+    platforms:
+      - windowsphone
+  - name: createX509CertificatePinningSecurityManager
+    platforms:
+      - windowsphone
+properties:
+  - name: debug
+    platforms:
+      - windowsphone
+  - name: ondatastream
+    platforms:
+      - windowsphone
+  - name: onsendstream
+    platforms:
+      - windowsphone
+  - name: useSecure
+    platforms:
+      - windowsphone
+  - name: sessionId
+    platforms:
+      - windowsphone
+  - name: accessToken
+    platforms:
+      - windowsphone
+  - name: expiresIn
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone
+---
+name: CloudStreamProgress
+properties:
+  - name: progress
+    platforms:
+      - windowsphone
+  - name: url
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone

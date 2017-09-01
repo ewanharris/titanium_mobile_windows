@@ -1,0 +1,31 @@
+---
+name: Modules.Cloud.Photos
+methods:
+  - name: create
+    platforms:
+      - windowsphone
+  - name: query
+    platforms:
+      - windowsphone
+  - name: remove
+    platforms:
+      - windowsphone
+  - name: search
+    platforms:
+      - windowsphone
+  - name: show
+    platforms:
+      - windowsphone
+  - name: update
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone
+---
+name: CloudPhotosResponse
+properties:
+  - name: photos
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone

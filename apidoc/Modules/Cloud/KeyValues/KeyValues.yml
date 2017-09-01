@@ -1,0 +1,28 @@
+---
+name: Modules.Cloud.KeyValues
+methods:
+  - name: append
+    platforms:
+      - windowsphone
+  - name: get
+    platforms:
+      - windowsphone
+  - name: increment
+    platforms:
+      - windowsphone
+  - name: remove
+    platforms:
+      - windowsphone
+  - name: set
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone
+---
+name: CloudKeyValuesResponse
+properties:
+  - name: keyvalues
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone

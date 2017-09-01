@@ -1,0 +1,40 @@
+---
+name: Modules.Cloud.Messages
+methods:
+  - name: create
+    platforms:
+      - windowsphone
+  - name: reply
+    platforms:
+      - windowsphone
+  - name: show
+    platforms:
+      - windowsphone
+  - name: showInbox
+    platforms:
+      - windowsphone
+  - name: showSent
+    platforms:
+      - windowsphone
+  - name: showThreads
+    platforms:
+      - windowsphone
+  - name: showThread
+    platforms:
+      - windowsphone
+  - name: remove
+    platforms:
+      - windowsphone
+  - name: removeThread
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone
+---
+name: CloudMessagesResponse
+properties:
+  - name: messages
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone

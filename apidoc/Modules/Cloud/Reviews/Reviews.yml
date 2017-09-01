@@ -1,0 +1,28 @@
+---
+name: Modules.Cloud.Reviews
+methods:
+  - name: create
+    platforms:
+      - windowsphone
+  - name: query
+    platforms:
+      - windowsphone
+  - name: remove
+    platforms:
+      - windowsphone
+  - name: show
+    platforms:
+      - windowsphone
+  - name: update
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone
+---
+name: CloudReviewsResponse
+properties:
+  - name: reviews
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone

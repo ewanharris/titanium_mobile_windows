@@ -1,0 +1,69 @@
+---
+name: Modules.Cloud.PushNotifications
+methods:
+  - name: notify
+    platforms:
+      - windowsphone
+  - name: notifyTokens
+    platforms:
+      - windowsphone
+  - name: resetBadge
+    platforms:
+      - windowsphone
+  - name: setBadge
+    platforms:
+      - windowsphone
+  - name: subscribe
+    platforms:
+      - windowsphone
+  - name: subscribeToken
+    platforms:
+      - windowsphone
+  - name: unsubscribe
+    platforms:
+      - windowsphone
+  - name: unsubscribeToken
+    platforms:
+      - windowsphone
+  - name: updateSubscription
+    platforms:
+      - windowsphone
+  - name: queryChannels
+    platforms:
+      - windowsphone
+  - name: showChannels
+    platforms:
+      - windowsphone
+  - name: query
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone
+---
+name: CloudPushNotificationsResponse
+platforms:
+  - windowsphone
+---
+name: CloudPushNotificationsQueryChannelResponse
+properties:
+  - name: push_channels
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone
+---
+name: CloudPushNotificationsShowChannelResponse
+properties:
+  - name: devices
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone
+---
+name: CloudPushNotificationsQueryResponse
+properties:
+  - name: subscriptions
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone

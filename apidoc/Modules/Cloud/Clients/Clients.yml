@@ -1,0 +1,19 @@
+---
+name: Modules.Cloud.Clients
+methods:
+  - name: geolocate
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone
+---
+name: CloudClientsResponse
+properties:
+  - name: ip_address
+    platforms:
+      - windowsphone
+  - name: location
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone

@@ -1,0 +1,12 @@
+---
+name: Modules.Cloud.Emails
+methods:
+  - name: send
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone
+---
+name: CloudEmailsResponse
+platforms:
+  - windowsphone

@@ -1,0 +1,19 @@
+---
+name: Modules.Cloud.Likes
+methods:
+  - name: create
+    platforms:
+      - windowsphone
+  - name: remove
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone
+---
+name: CloudLikesResponse
+properties:
+  - name: likes
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone

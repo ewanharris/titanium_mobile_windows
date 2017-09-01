@@ -1,0 +1,74 @@
+---
+name: Modules.Cloud.Users
+methods:
+  - name: create
+    platforms:
+      - windowsphone
+  - name: login
+    platforms:
+      - windowsphone
+  - name: logout
+    platforms:
+      - windowsphone
+  - name: query
+    platforms:
+      - windowsphone
+  - name: search
+    platforms:
+      - windowsphone
+  - name: show
+    platforms:
+      - windowsphone
+  - name: showMe
+    platforms:
+      - windowsphone
+  - name: update
+    platforms:
+      - windowsphone
+  - name: remove
+    platforms:
+      - windowsphone
+  - name: requestResetPassword
+    platforms:
+      - windowsphone
+  - name: resendConfirmation
+    platforms:
+      - windowsphone
+  - name: secureCreate
+    platforms:
+      - windowsphone
+  - name: secureLogin
+    platforms:
+      - windowsphone
+  - name: secureStatus
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone
+---
+name: CloudUsersSecureDialog
+properties:
+  - name: title
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone
+---
+name: CloudUsersResponse
+properties:
+  - name: users
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone
+---
+name: CloudUsersSecureResponse
+properties:
+  - name: accessToken
+    platforms:
+      - windowsphone
+  - name: expiresIn
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone

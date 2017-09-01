@@ -1,0 +1,36 @@
+---
+name: Modules.Cloud.Chats
+methods:
+  - name: create
+    platforms:
+      - windowsphone
+  - name: remove
+    platforms:
+      - windowsphone
+  - name: getChatGroups
+    platforms:
+      - windowsphone
+  - name: queryChatGroups
+    platforms:
+      - windowsphone
+  - name: query
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone
+---
+name: CloudChatsResponse
+properties:
+  - name: chats
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone
+---
+name: CloudChatGroupsResponse
+properties:
+  - name: chat_groups
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone

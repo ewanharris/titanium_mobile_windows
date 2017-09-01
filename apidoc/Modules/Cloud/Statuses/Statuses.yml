@@ -1,0 +1,31 @@
+---
+name: Modules.Cloud.Statuses
+methods:
+  - name: create
+    platforms:
+      - windowsphone
+  - name: update
+    platforms:
+      - windowsphone
+  - name: show
+    platforms:
+      - windowsphone
+  - name: delete
+    platforms:
+      - windowsphone
+  - name: query
+    platforms:
+      - windowsphone
+  - name: search
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone
+---
+name: CloudStatusesResponse
+properties:
+  - name: statuses
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone

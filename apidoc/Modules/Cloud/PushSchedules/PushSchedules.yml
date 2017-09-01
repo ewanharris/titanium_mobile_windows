@@ -1,0 +1,22 @@
+---
+name: Modules.Cloud.PushSchedules
+methods:
+  - name: create
+    platforms:
+      - windowsphone
+  - name: remove
+    platforms:
+      - windowsphone
+  - name: query
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone
+---
+name: CloudPushSchedulesResponse
+properties:
+  - name: push_schedules
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone

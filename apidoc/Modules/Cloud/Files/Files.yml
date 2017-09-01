@@ -1,0 +1,28 @@
+---
+name: Modules.Cloud.Files
+methods:
+  - name: create
+    platforms:
+      - windowsphone
+  - name: query
+    platforms:
+      - windowsphone
+  - name: remove
+    platforms:
+      - windowsphone
+  - name: show
+    platforms:
+      - windowsphone
+  - name: update
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone
+---
+name: CloudFilesResponse
+properties:
+  - name: files
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone

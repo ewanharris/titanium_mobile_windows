@@ -1,0 +1,42 @@
+---
+name: Modules.Cloud.ACLs
+methods:
+  - name: create
+    platforms:
+      - windowsphone
+  - name: update
+    platforms:
+      - windowsphone
+  - name: show
+    platforms:
+      - windowsphone
+  - name: remove
+    platforms:
+      - windowsphone
+  - name: addUser
+    platforms:
+      - windowsphone
+  - name: removeUser
+    platforms:
+      - windowsphone
+  - name: checkUser
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone
+---
+name: CloudACLsResponse
+properties:
+  - name: acls
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone
+---
+name: CloudACLsCheckResponse
+properties:
+  - name: permission
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone

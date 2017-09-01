@@ -1,0 +1,25 @@
+---
+name: Modules.Cloud.Checkins
+methods:
+  - name: create
+    platforms:
+      - windowsphone
+  - name: query
+    platforms:
+      - windowsphone
+  - name: remove
+    platforms:
+      - windowsphone
+  - name: show
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone
+---
+name: CloudCheckinsResponse
+properties:
+  - name: checkins
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone

@@ -1,0 +1,25 @@
+---
+name: Modules.Cloud.SocialIntegrations
+methods:
+  - name: externalAccountLink
+    platforms:
+      - windowsphone
+  - name: externalAccountLogin
+    platforms:
+      - windowsphone
+  - name: externalAccountUnlink
+    platforms:
+      - windowsphone
+  - name: searchFacebookFriends
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone
+---
+name: CloudSocialIntegrationsResponse
+properties:
+  - name: users
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone

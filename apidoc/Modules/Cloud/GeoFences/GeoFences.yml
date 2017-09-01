@@ -1,0 +1,25 @@
+---
+name: Modules.Cloud.GeoFences
+methods:
+  - name: create
+    platforms:
+      - windowsphone
+  - name: query
+    platforms:
+      - windowsphone
+  - name: remove
+    platforms:
+      - windowsphone
+  - name: update
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone
+---
+name: CloudGeoFenceResponse
+properties:
+  - name: geo_fences
+    platforms:
+      - windowsphone
+platforms:
+  - windowsphone
