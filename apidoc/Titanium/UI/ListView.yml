@@ -32,6 +32,10 @@ methods:
     platforms: [windowsphone]
   - name: replaceSectionAt
     platforms: [windowsphone]
+  - name: addMarker
+    platforms: [windowsphone]
+  - name: setMarker
+    platforms: [windowsphone]
   - name: getTemplates
     platforms: [windowsphone]
   - name: setTemplates

@@ -1,13 +1,21 @@
 name: Titanium.UI.SearchBar
 platforms: [windowsphone]
 properties:
+  - name: barColor
+    platforms: [windowsphone]
   - name: hintText
     platforms: [windowsphone]
   - name: hinttextid
     platforms: [windowsphone]
+  - name: showCancel
+    platforms: [windowsphone]
   - name: value
     platforms: [windowsphone]
 methods:
+  - name: getBarColor
+    platforms: [windowsphone]
+  - name: setBarColor
+    platforms: [windowsphone]
   - name: getHintText
     platforms: [windowsphone]
   - name: setHintText
@@ -15,6 +23,10 @@ methods:
   - name: getHinttextid
     platforms: [windowsphone]
   - name: setHinttextid
+    platforms: [windowsphone]
+  - name: getShowCancel
+    platforms: [windowsphone]
+  - name: setShowCancel
     platforms: [windowsphone]
   - name: getValue
     platforms: [windowsphone]
