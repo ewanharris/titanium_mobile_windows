@@ -75,7 +75,7 @@ timestamps {
 			if (isUnix()) {
 				sh 'mv apidoc/Titanium dist/windows/doc/Titanium'
 				sh 'mv apidoc/Modules dist/windows/doc/Modules'
-				sh 'mv apidoc/WindowsOnly dist/windows/doc/Windowsonly'
+				sh 'mv apidoc/WindowsOnly dist/windows/doc/WindowsOnly'
 			} else {
 				bat '(robocopy apidoc\\\\Titanium dist\\\\windows\\\\doc\\\\Titanium /e) ^& IF %ERRORLEVEL% LEQ 3 cmd /c exit 0'
 				bat '(robocopy apidoc\\\\Modules dist\\\\windows\\\\doc\\\\Modules /e) ^& IF %ERRORLEVEL% LEQ 3 cmd /c exit 0'
