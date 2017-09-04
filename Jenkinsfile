@@ -38,6 +38,7 @@ def unitTests(target, branch, testSuiteBranch) {
 
 		dir('Tools/Scripts/build') {
 			echo 'Setting up SDK'
+			bat 'dir'
 			bat "node setupSDK.js --branch ${branch}"
 		}
 
