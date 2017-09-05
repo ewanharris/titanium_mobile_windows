@@ -61,7 +61,11 @@ def unitTests(target, branch, testSuiteBranch) {
 			} catch (e) {
 				throw e
 			} finally {
-				bat 'taskkill /IM xde.exe'
+				if ('ws-local'.equals(target)){
+					bat 'taskkill /IM mocha.exe /F 2> nul'
+				} else if ('wp-emulator'.equals(target)) {
+					bat 'taskkill /IM xde.exe /F 2> nul'
+				}
 			}
 			junit 'junit.*.xml'
 		} // dir 'titanium-mobile-mocha-suite/scripts
