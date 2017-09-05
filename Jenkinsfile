@@ -46,7 +46,7 @@ def unitTests(target, branch, testSuiteBranch) {
 
 
 		// if our test suite already exists, delete it
-		bat 'rmdir titanium-mobile-mocha-suite /Q /S'
+		bat 'if exist titanium-mobile-mocha-suite rmdir titanium-mobile-mocha-suite /Q /S'
 		// clone the tests suite fresh
 		// FIXME Clone once on initial node and use stash/unstash to ensure all OSes use exact same checkout revision
 		dir('titanium-mobile-mocha-suite') {
@@ -154,11 +154,11 @@ timestamps {
 					// junit 'dist/junit_report.xml'
 				}
 			},
-			'Windows 10 ARM': {
-				node('msbuild-14 && vs2015 && hyper-v && windows-sdk-10 && npm && node && cmake && jsc') {
-					build('10.0', '14.0', 'WindowsStore-ARM', gitCommit)
-				}
-			},
+			// 'Windows 10 ARM': {
+			// 	node('msbuild-14 && vs2015 && hyper-v && windows-sdk-10 && npm && node && cmake && jsc') {
+			// 		build('10.0', '14.0', 'WindowsStore-ARM', gitCommit)
+			// 	}
+			// },
 			failFast: true
 		)
 	} // Stage build
