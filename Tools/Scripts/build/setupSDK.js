@@ -163,8 +163,18 @@ function setupSDK(branch, location) {
 			});
 		},
 		function (next) {
-			console.log("Copying built Windows SDK into master SDK");
+			console.log("Copying built Windows SDK from " + location + " into master SDK at " + sdkPath);
 			copyWindowsIntoSDK(sdkPath, location, next);
+			fs.readdirSync(path.join(sdkPath, 'windows', 'lib'))
+				.forEach(lib => {
+					const dir = path.join(sdkPath, 'windows', 'lib', lib, 'win10', 'x86');
+					console.log(dir)
+					if (fs.existsSync(dir)) {
+						console.log(fs.readdirSync(dir));
+					} else {
+						console.log('no exist')
+					}
+				});
 		},
 		function (next) {
 			if (hadWindowsSDK) {
