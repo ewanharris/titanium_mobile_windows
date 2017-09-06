@@ -34,7 +34,7 @@ def build(sdkVersion, msBuildVersion, architecture, gitCommit) {
 	archiveArtifacts artifacts: 'dist/**/*'
 }
 
-def unitTests(target, deviceId, branch, testSuiteBranch) {
+def unitTests(target, branch, testSuiteBranch) {
 	node('msbuild-14 && vs2015 && hyper-v && windows-sdk-10 && npm && node && cmake && jsc') {
 
 		dir('Tools/Scripts/build') {
