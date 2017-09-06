@@ -2,6 +2,7 @@
 
 def gitCommit = ''
 def testTimeout = 25
+def defaultEmulatorID = '10-0-3'
 
 def build(sdkVersion, msBuildVersion, architecture, gitCommit) {
 	unstash 'sources' // for build
@@ -33,7 +34,7 @@ def build(sdkVersion, msBuildVersion, architecture, gitCommit) {
 	archiveArtifacts artifacts: 'dist/**/*'
 }
 
-def unitTests(target, branch, testSuiteBranch) {
+def unitTests(target, deviceId, branch, testSuiteBranch) {
 	node('msbuild-14 && vs2015 && hyper-v && windows-sdk-10 && npm && node && cmake && jsc') {
 
 		dir('Tools/Scripts/build') {
@@ -55,7 +56,12 @@ def unitTests(target, branch, testSuiteBranch) {
 		dir('titanium-mobile-mocha-suite/scripts') {
 			bat 'npm install .'
 			try {
-				bat "node test.js -p windows -T ${target} --skip-sdk-install --cleanup"
+				if ('wp-emulator'.equals(target)) {
+					bat "node test.js -p windows -T ${target} -C ${defaultEmulatorID} --skip-sdk-install --cleanup"
+
+				} else {
+					bat "node test.js -p windows -T ${target} --skip-sdk-install --cleanup"
+				}
 			} catch (e) {
 				throw e
 			} finally {
@@ -176,6 +182,7 @@ timestamps {
 
 		parallel(
 			'ws-local unit tests': unitTests('ws-local', targetBranch, 'TIMOB-24816'),
+			'wp-emulator unit tests': unitTests('wp-emulator', targetBranch, 'TIMOB-24816'),
 			failFast: true
 		)
 	}
