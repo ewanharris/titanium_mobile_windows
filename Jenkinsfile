@@ -184,6 +184,7 @@ timestamps {
 
 		parallel(
 			'ws-local unit tests': unitTests('ws-local', targetBranch, 'TIMOB-24816'),
+			'wp-emulator unit tests': unitTests('wp-emulator', targetBranch, 'TIMOB-24816'),
 			failFast: true
 		)
 	}
