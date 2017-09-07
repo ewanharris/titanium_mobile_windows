@@ -58,13 +58,15 @@ def unitTests(target, branch, testSuiteBranch) {
 			bat 'npm install .'
 			echo "${target}"
 			try {
-				if ('wp-emulator'.equals(target)) {
-					bat "node test.js -p windows -T ${target} -C ${defaultEmulatorID} --skip-sdk-install --cleanup"
-
-				} else {
+				if ('ws-local'.equals(target)){
+					echo "Running tests on ws-local"
 					bat "node test.js -p windows -T ${target} --skip-sdk-install --cleanup"
+				} else if ('wp-emulator'.equals(target)) {
+					echo "Running tests on wp-emulator"
+					bat "node test.js -p windows -T ${target} -C ${defaultEmulatorID} --skip-sdk-install --cleanup"
 				}
 			} catch (e) {
+				echo "${e}"
 				throw e
 			} finally {
 				if ('ws-local'.equals(target)){
