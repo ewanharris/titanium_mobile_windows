@@ -35,7 +35,7 @@ def build(sdkVersion, msBuildVersion, architecture, gitCommit) {
 }
 
 def unitTests(target, branch, testSuiteBranch) {
-	node('msbuild-14 && vs2015 && hyper-v && windows-sdk-10 && npm && node && cmake && jsc') {
+	node('msbuild-14 && vs2015 && hyper-v && windows-sdk-10 && npm && node && cmake && jsc && Win-Gin10') {
 		unarchive mapping: ['dist/' : '.']
 		dir('Tools/Scripts/build') {
 			echo 'Setting up SDK'
@@ -54,6 +54,7 @@ def unitTests(target, branch, testSuiteBranch) {
 
 		dir('titanium-mobile-mocha-suite/scripts') {
 			bat 'npm install .'
+			echo "${target}"
 			try {
 				if ('wp-emulator'.equals(target)) {
 					bat "node test.js -p windows -T ${target} -C ${defaultEmulatorID} --skip-sdk-install --cleanup"
