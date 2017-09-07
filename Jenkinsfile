@@ -37,7 +37,7 @@ def build(sdkVersion, msBuildVersion, architecture, gitCommit) {
 
 def unitTests(target, branch, testSuiteBranch) {
 	node('msbuild-14 && vs2015 && hyper-v && windows-sdk-10 && npm && node && cmake && jsc && Win-Gin10') {
-		def defaultEmulatorID = '10-0-3'
+		def defaultEmulatorID = '10-0-1'
 		// unarchive mapping: ['dist/' : '.']
 		dir('Tools/Scripts/build') {
 			echo 'Setting up SDK'
@@ -63,11 +63,7 @@ def unitTests(target, branch, testSuiteBranch) {
 					bat "node test.js -p windows -T ${target} --skip-sdk-install --cleanup"
 				} else if ('wp-emulator'.equals(target)) {
 					echo "Running tests on wp-emulator"
-					echo "${defaultEmulatorID}"
 					bat "node test.js -p windows -T ${target} -C ${defaultEmulatorID} --skip-sdk-install --cleanup"
-				} else {
-					echo "lol wat"
-					echo "${target}"
 				}
 			} catch (e) {
 				echo "${e}"
