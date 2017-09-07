@@ -4,7 +4,6 @@ properties([buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: 
 
 def gitCommit = ''
 def testTimeout = 25
-def defaultEmulatorID = '10-0-3'
 
 def build(sdkVersion, msBuildVersion, architecture, gitCommit) {
 	unstash 'sources' // for build
@@ -38,6 +37,7 @@ def build(sdkVersion, msBuildVersion, architecture, gitCommit) {
 
 def unitTests(target, branch, testSuiteBranch) {
 	node('msbuild-14 && vs2015 && hyper-v && windows-sdk-10 && npm && node && cmake && jsc && Win-Gin10') {
+		def defaultEmulatorID = '10-0-3'
 		// unarchive mapping: ['dist/' : '.']
 		dir('Tools/Scripts/build') {
 			echo 'Setting up SDK'
