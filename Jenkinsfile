@@ -99,7 +99,6 @@ timestamps {
 			gitCommit = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
 			// Stash our source code/scripts so we don't need to checkout again?
 			stash name: 'sources', includes: '**', excludes: 'apidoc/**,test/**,Examples/**'
-			triggerDownstream =
 		} // Checkout stage
 
 		stage('Docs') {
