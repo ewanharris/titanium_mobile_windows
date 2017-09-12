@@ -36,47 +36,45 @@ def build(sdkVersion, msBuildVersion, architecture, gitCommit) {
 } // def build
 
 def unitTests(target, branch, testSuiteBranch) {
-	node('msbuild-14 && vs2015 && hyper-v && windows-sdk-10 && npm && node && cmake && jsc') {
-		def defaultEmulatorID = '10-0-1'
-		unarchive mapping: ['dist/' : '.']
-		dir('Tools/Scripts/build') {
-			echo 'Setting up SDK'
-			bat "node setupSDK.js --branch ${branch}"
-		}
+	def defaultEmulatorID = '10-0-1'
+	unarchive mapping: ['dist/' : '.']
+	dir('Tools/Scripts/build') {
+		echo 'Setting up SDK'
+		bat "node setupSDK.js --branch ${branch}"
+	}
 
-		// if our test suite already exists, delete it
-		bat 'if exist titanium-mobile-mocha-suite rmdir titanium-mobile-mocha-suite /Q /S'
-		// clone the tests suite fresh
-		// FIXME Clone once on initial node and use stash/unstash to ensure all OSes use exact same checkout revision
-		dir('titanium-mobile-mocha-suite') {
-			// TODO Do a shallow clone, using same credentials as from scm object
-			git changelog: false, poll: false, credentialsId: 'd05dad3c-d7f9-4c65-9cb6-19fef98fc440', url: 'https://github.com/appcelerator/titanium-mobile-mocha-suite.git', branch: testSuiteBranch
-		}
+	// if our test suite already exists, delete it
+	bat 'if exist titanium-mobile-mocha-suite rmdir titanium-mobile-mocha-suite /Q /S'
+	// clone the tests suite fresh
+	// FIXME Clone once on initial node and use stash/unstash to ensure all OSes use exact same checkout revision
+	dir('titanium-mobile-mocha-suite') {
+		// TODO Do a shallow clone, using same credentials as from scm object
+		git changelog: false, poll: false, credentialsId: 'd05dad3c-d7f9-4c65-9cb6-19fef98fc440', url: 'https://github.com/appcelerator/titanium-mobile-mocha-suite.git', branch: testSuiteBranch
+	}
 
-		dir('titanium-mobile-mocha-suite/scripts') {
-			bat 'npm install .'
-			echo "${target}"
-			try {
-				if ('ws-local'.equals(target)){
-					echo "Running tests on ws-local"
-					bat "node test.js -p windows -T ${target} --skip-sdk-install --cleanup"
-				} else if ('wp-emulator'.equals(target)) {
-					echo "Running tests on wp-emulator"
-					bat "node test.js -p windows -T ${target} -C ${defaultEmulatorID} --skip-sdk-install --cleanup"
-				}
-			} catch (e) {
-				echo "${e}"
-				throw e
-			} finally {
-				if ('ws-local'.equals(target)){
-					bat 'taskkill /IM mocha.exe /F 2> nul'
-				} else if ('wp-emulator'.equals(target)) {
-					bat 'taskkill /IM xde.exe /F 2> nul'
-				}
+	dir('titanium-mobile-mocha-suite/scripts') {
+		bat 'npm install .'
+		echo "${target}"
+		try {
+			if ('ws-local'.equals(target)){
+				echo "Running tests on ws-local"
+				bat "node test.js -p windows -T ${target} --skip-sdk-install --cleanup"
+			} else if ('wp-emulator'.equals(target)) {
+				echo "Running tests on wp-emulator"
+				bat "node test.js -p windows -T ${target} -C ${defaultEmulatorID} --skip-sdk-install --cleanup"
 			}
-			junit 'junit.*.xml'
-		} // dir 'titanium-mobile-mocha-suite/scripts
-	} // node
+		} catch (e) {
+			echo "${e}"
+			throw e
+		} finally {
+			if ('ws-local'.equals(target)){
+				bat 'taskkill /IM mocha.exe /F 2> nul'
+			} else if ('wp-emulator'.equals(target)) {
+				bat 'taskkill /IM xde.exe /F 2> nul'
+			}
+		}
+		junit 'junit.*.xml'
+	} // dir 'titanium-mobile-mocha-suite/scripts
 } // def unitTests
 
 // wrap in timestamps
@@ -157,8 +155,17 @@ timestamps {
 
 	stage('Test') {
 		parallel(
-			'ws-local unit tests': unitTests('ws-local', targetBranch, 'windows'),
-			'wp-emulator unit tests': unitTests('wp-emulator', targetBranch, 'windows'),
+			'ws-local': {
+				// FIXME This is specifically tied to Win-Gin10 for stability
+				node('msbuild-14 && vs2015 && hyper-v && windows-sdk-10 && npm && node && cmake && jsc && Win-Gin10') {
+					unitTests('ws-local', targetBranch, 'windows')
+				}
+			},
+			'wp-emulator': {
+				node('msbuild-14 && vs2015 && hyper-v && windows-sdk-10 && npm && node && cmake && jsc') {
+					unitTests('wp-emulator', targetBranch, 'windows')
+				}
+			},
 			failFast: true
 		)
 	} // stage Test
