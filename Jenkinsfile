@@ -37,7 +37,7 @@ def build(sdkVersion, msBuildVersion, architecture, gitCommit) {
 
 def unitTests(target, branch, testSuiteBranch) {
 	def defaultEmulatorID = '10-0-1'
-	unarchive mapping: ['dist/' : '.']
+	// unarchive mapping: ['dist/' : '.']
 	dir('Tools/Scripts/build') {
 		echo 'Setting up SDK'
 		bat "node setupSDK.js --branch ${branch}"
@@ -63,10 +63,10 @@ def unitTests(target, branch, testSuiteBranch) {
 				echo "Running tests on wp-emulator"
 				// FIXME Need to see if the emulators are set up paired/dev mode/checkpoint and all have same id
 				// There could be 10.0.10240/10586/14393/15063 emulators on the boxes!
-				// Seems like "10.0.14393.0 WVGA 4 inch 512MB.build" is good on WinGin-03, which is 10-0-1. Has only 10.0.14393 emulators for Windows 10
+				// Seems like "10.0.14393.0 WVGA 4 inch 512MB" is good on WinGin-03, which is 10-0-1. Has only 10.0.14393 emulators for Windows 10
 				// Seems like "10.0.10586.0 WVGA 4 inch 512MB" is good on WinGin04, which is 10-0-1. Has both 10.0.10586 and 10.0.14393 emulators for Windows 10
-				// Seems like "10.0.14393.0 WVGA 4 inch 512MB.build" is good on WinGin-02, which is 10-0-1. Has only 10.0.14393 emulators for Windows 10
-				// Seems like "10.0.14393.0 WVGA 4 inch 512MB.build" is good on WinGin10, which is 10-0-1. Has only 10.0.14393 emulators for Windows 10
+				// Seems like "10.0.14393.0 WVGA 4 inch 512MB" is good on WinGin-02, which is 10-0-1. Has only 10.0.14393 emulators for Windows 10
+				// Seems like "10.0.14393.0 WVGA 4 inch 512MB" and maybe "10.0.14393.0 WXGA 4.5 inch 512MB" is good on WinGin10, WVGA is 10-0-1. Has only 10.0.14393 emulators for Windows 10
 				bat "node test.js -p windows -T ${target} -C ${defaultEmulatorID} --skip-sdk-install --cleanup"
 			}
 		} catch (e) {
