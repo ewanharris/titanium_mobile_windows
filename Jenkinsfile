@@ -104,31 +104,31 @@ timestamps {
 			// Stash our source code/scripts so we don't need to checkout again?
 			stash name: 'sources', includes: '**', excludes: 'apidoc/**,test/**,Examples/**'
 		} // Checkout stage
-
-		stage('Docs') {
-			if (isUnix()) {
-				sh 'mkdir -p dist/windows/doc'
-			} else {
-				bat 'mkdir dist\\\\windows\\\\doc'
-			}
-			echo 'Generating docs'
-			dir('apidoc') {
-				if (isUnix()) {
-					sh 'npm install .'
-					sh 'node ti_win_yaml.js'
-				} else {
-					bat 'call npm install .'
-					bat 'call node ti_win_yaml.js'
-				}
-			}
-			echo 'copying generated docs to dist folder'
-			if (isUnix()) {
-				sh 'mv apidoc/Titanium dist/windows/doc/Titanium'
-			} else {
-				bat '(robocopy apidoc\\\\Titanium dist\\\\windows\\\\doc\\\\Titanium /e) ^& IF %ERRORLEVEL% LEQ 3 cmd /c exit 0'
-			}
-			archiveArtifacts artifacts: 'dist/**/*'
-		} // stage('Docs')
+		//
+		// stage('Docs') {
+		// 	if (isUnix()) {
+		// 		sh 'mkdir -p dist/windows/doc'
+		// 	} else {
+		// 		bat 'mkdir dist\\\\windows\\\\doc'
+		// 	}
+		// 	echo 'Generating docs'
+		// 	dir('apidoc') {
+		// 		if (isUnix()) {
+		// 			sh 'npm install .'
+		// 			sh 'node ti_win_yaml.js'
+		// 		} else {
+		// 			bat 'call npm install .'
+		// 			bat 'call node ti_win_yaml.js'
+		// 		}
+		// 	}
+		// 	echo 'copying generated docs to dist folder'
+		// 	if (isUnix()) {
+		// 		sh 'mv apidoc/Titanium dist/windows/doc/Titanium'
+		// 	} else {
+		// 		bat '(robocopy apidoc\\\\Titanium dist\\\\windows\\\\doc\\\\Titanium /e) ^& IF %ERRORLEVEL% LEQ 3 cmd /c exit 0'
+		// 	}
+		// 	archiveArtifacts artifacts: 'dist/**/*'
+		// } // stage('Docs')
 	} // node
 
 	// Are we on a PR/feature branch, or a "mainline" branch like master/6_2_X/7_0_X?
@@ -143,21 +143,21 @@ timestamps {
 	// Trigger titanium_mobile if we're on a mainline branch
 	def triggerDownstream = isMainlineBranch
 
-	stage('Build') {
-		parallel(
-			'Windows 10 x86': {
-				node('msbuild-14 && vs2015 && hyper-v && windows-sdk-10 && npm && node && cmake && jsc') {
-					build('10.0', '14.0', 'WindowsStore-x86', gitCommit)
-				}
-			},
-			'Windows 10 ARM': {
-				node('msbuild-14 && vs2015 && hyper-v && windows-sdk-10 && npm && node && cmake && jsc') {
-					build('10.0', '14.0', 'WindowsStore-ARM', gitCommit)
-				}
-			},
-			failFast: true
-		)
-	} // Stage build
+	// stage('Build') {
+	// 	parallel(
+	// 		'Windows 10 x86': {
+	// 			node('msbuild-14 && vs2015 && hyper-v && windows-sdk-10 && npm && node && cmake && jsc') {
+	// 				build('10.0', '14.0', 'WindowsStore-x86', gitCommit)
+	// 			}
+	// 		},
+	// 		'Windows 10 ARM': {
+	// 			node('msbuild-14 && vs2015 && hyper-v && windows-sdk-10 && npm && node && cmake && jsc') {
+	// 				build('10.0', '14.0', 'WindowsStore-ARM', gitCommit)
+	// 			}
+	// 		},
+	// 		failFast: true
+	// 	)
+	// } // Stage build
 
 	stage('Test') {
 		parallel(
