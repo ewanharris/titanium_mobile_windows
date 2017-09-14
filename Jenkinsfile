@@ -38,11 +38,11 @@ def build(sdkVersion, msBuildVersion, architecture, gitCommit) {
 def unitTests(target, branch, testSuiteBranch) {
 	def defaultEmulatorID = '10-0-1'
 	// unarchive mapping: ['dist/' : '.']
-	dir('Tools/Scripts/build') {
-		echo 'Setting up SDK'
-		bat 'npm install .'
-		bat "node setupSDK.js --branch ${branch}"
-	}
+	// dir('Tools/Scripts/build') {
+	// 	echo 'Setting up SDK'
+	// 	bat 'npm install .'
+	// 	bat "node setupSDK.js --branch ${branch}"
+	// }
 
 	// if our test suite already exists, delete it
 	bat 'if exist titanium-mobile-mocha-suite rmdir titanium-mobile-mocha-suite /Q /S'
@@ -59,6 +59,7 @@ def unitTests(target, branch, testSuiteBranch) {
 		try {
 			if ('ws-local'.equals(target)){
 				echo "Running tests on ws-local"
+				// bat "node test.js -p windows -T ${target} --skip-sdk-install --cleanup"
 				bat "node test.js -p windows -T ${target} --skip-sdk-install --cleanup"
 			} else if ('wp-emulator'.equals(target)) {
 				echo "Running tests on wp-emulator"
@@ -68,7 +69,8 @@ def unitTests(target, branch, testSuiteBranch) {
 				// Seems like "10.0.10586.0 WVGA 4 inch 512MB" is good on WinGin04, which is 10-0-1. Has both 10.0.10586 and 10.0.14393 emulators for Windows 10
 				// Seems like "10.0.14393.0 WVGA 4 inch 512MB" is good on WinGin-02, which is 10-0-1. Has only 10.0.14393 emulators for Windows 10
 				// Seems like "10.0.14393.0 WVGA 4 inch 512MB" and maybe "10.0.14393.0 WXGA 4.5 inch 512MB" is good on WinGin10, WVGA is 10-0-1. Has only 10.0.14393 emulators for Windows 10
-				bat "node test.js -p windows -T ${target} -C ${defaultEmulatorID} --skip-sdk-install --cleanup"
+				// bat "node test.js -p windows -T ${target} -C ${defaultEmulatorID} --skip-sdk-install --cleanup"
+				bat "node test.js -p windows -T ${target} -C ${defaultEmulatorID}"
 			}
 		} catch (e) {
 			echo "${e}"
