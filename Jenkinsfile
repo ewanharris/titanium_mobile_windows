@@ -40,6 +40,7 @@ def unitTests(target, branch, testSuiteBranch) {
 	// unarchive mapping: ['dist/' : '.']
 	dir('Tools/Scripts/build') {
 		echo 'Setting up SDK'
+		bat 'npm install .'
 		bat "node setupSDK.js --branch ${branch}"
 	}
 
