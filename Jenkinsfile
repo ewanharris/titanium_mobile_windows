@@ -60,7 +60,7 @@ def unitTests(target, branch, testSuiteBranch) {
 			if ('ws-local'.equals(target)){
 				echo "Running tests on ws-local"
 				// bat "node test.js -p windows -T ${target} --skip-sdk-install --cleanup"
-				bat "node test.js -p windows -T ${target} --skip-sdk-install --cleanup"
+				bat "node test.js -p windows -T ${target}"
 			} else if ('wp-emulator'.equals(target)) {
 				echo "Running tests on wp-emulator"
 				// FIXME Need to see if the emulators are set up paired/dev mode/checkpoint and all have same id
