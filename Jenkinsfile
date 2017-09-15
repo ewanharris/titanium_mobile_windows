@@ -4,6 +4,8 @@ properties([buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: 
 
 def gitCommit = ''
 // Variables we can change
+// FIXME Using the nodejs jenkisn plugin introduces complications that cause us not to properly connect to the Windows Phone emulator for logs
+// Likely need to modify the firewall rules to allow traffic from the new nodejs install like we do for system install!
 def nodeVersion = '6.10.3' // NOTE that changing this requires we set up the desired version on jenkins master first!
 def testTimeout = 25
 
@@ -14,8 +16,8 @@ def build(sdkVersion, msBuildVersion, architecture, gitCommit, nodeVersion) {
 	}
 	bat 'mkdir dist\\windows'
 
-	nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
-		bat 'npm install -g npm@5.4.1' // Install NPM 5.4.1
+	// nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
+	// 	bat 'npm install -g npm@5.4.1' // Install NPM 5.4.1
 		dir('Tools/Scripts') {
 			bat 'npm install .'
 			echo "Installing JSC built for Windows ${sdkVersion}"
@@ -36,15 +38,15 @@ def build(sdkVersion, msBuildVersion, architecture, gitCommit, nodeVersion) {
 				}
 			} // timeout
 		} // dir Tool/Scripts/build
-	} // nodejs
+	// } // nodejs
 	archiveArtifacts artifacts: 'dist/**/*'
 } // def build
 
 def unitTests(target, branch, testSuiteBranch, nodeVersion) {
 	def defaultEmulatorID = '10-0-1'
 	// unarchive mapping: ['dist/' : '.'] // copy in built SDK from dist/ folder (from Build stage)
-	nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
-		bat 'npm install -g npm@5.4.1' // Install NPM 5.4.1
+	// nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
+	// 	bat 'npm install -g npm@5.4.1' // Install NPM 5.4.1
 		// dir('Tools/Scripts/build') {
 		// 	echo 'Setting up SDK'
 		// 	bat 'npm install .'
@@ -82,7 +84,7 @@ def unitTests(target, branch, testSuiteBranch, nodeVersion) {
 			}
 			junit 'junit.*.xml'
 		} // dir 'titanium-mobile-mocha-suite/scripts
-	} // nodejs
+	// } // nodejs
 } // def unitTests
 
 // wrap in timestamps
@@ -153,12 +155,12 @@ timestamps {
 	// stage('Build') {
 	// 	parallel(
 	// 		'Windows 10 x86': {
-	// 			node('msbuild-14 && vs2015 && windows-sdk-10 && cmake && jsc') {
+	// 			node('msbuild-14 && vs2015 && windows-sdk-10 && node && npm && cmake && jsc') {
 	// 				build('10.0', '14.0', 'WindowsStore-x86', gitCommit, nodeVersion)
 	// 			}
 	// 		},
 	// 		'Windows 10 ARM': {
-	// 			node('msbuild-14 && vs2015 && windows-sdk-10 && cmake && jsc') {
+	// 			node('msbuild-14 && vs2015 && windows-sdk-10 && node && npm && cmake && jsc') {
 	// 				build('10.0', '14.0', 'WindowsStore-ARM', gitCommit, nodeVersion)
 	// 			}
 	// 		},
@@ -170,12 +172,12 @@ timestamps {
 		def testSuiteBranch = 'windows' // TODO Make this = targetBranch
 		parallel(
 			'ws-local': {
-				node('msbuild-14 && vs2015 && windows-sdk-10 && cmake') {
+				node('msbuild-14 && vs2015 && windows-sdk-10 && cmake && node && npm') {
 					unitTests('ws-local', targetBranch, testSuiteBranch, nodeVersion)
 				}
 			},
 			'wp-emulator': {
-				node('msbuild-14 && vs2015 && hyper-v && windows-sdk-10 && cmake') {
+				node('msbuild-14 && vs2015 && hyper-v && windows-sdk-10 && cmake && node && npm') {
 					unitTests('wp-emulator', targetBranch, testSuiteBranch, nodeVersion)
 				}
 			}
