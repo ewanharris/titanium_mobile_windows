@@ -3,92 +3,91 @@
 properties([buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: '5'))])
 
 def gitCommit = ''
+// Variables we can change
+def nodeVersion = '6.10.3' // NOTE that changing this requires we set up the desired version on jenkins master first!
 def testTimeout = 25
 
-def build(sdkVersion, msBuildVersion, architecture, gitCommit) {
+def build(sdkVersion, msBuildVersion, architecture, gitCommit, nodeVersion) {
 	unstash 'sources' // for build
 	if (fileExists('dist/windows')) {
 		bat 'rmdir dist\\windows /Q /S'
 	}
 	bat 'mkdir dist\\windows'
 
-	dir('Tools/Scripts') {
-		bat 'npm install .'
-		echo "Installing JSC built for Windows ${sdkVersion}"
-		bat "node setup.js -s ${sdkVersion} --no-color --no-progress-bars"
-		bat 'rmdir node_modules /Q /S'
-	}
+	nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
+		bat 'npm install -g npm@5.4.1' // Install NPM 5.4.1
+		dir('Tools/Scripts') {
+			bat 'npm install .'
+			echo "Installing JSC built for Windows ${sdkVersion}"
+			bat "node setup.js -s ${sdkVersion} --no-color --no-progress-bars"
+			bat 'rmdir node_modules /Q /S'
+		}
 
-	dir('Tools/Scripts/build') {
-		bat 'npm install .'
+		dir('Tools/Scripts/build') {
+			bat 'npm install .'
 
-		timeout(45) {
-			echo "Building for ${architecture} ${sdkVersion}"
-			def raw = bat(returnStdout: true, script: "echo %JavaScriptCore_${sdkVersion}_HOME%").trim()
-			def jscHome = raw.split('\n')[-1]
-			echo "Setting JavaScriptCore_HOME to ${jscHome}"
-			withEnv(["JavaScriptCore_HOME=${jscHome}"]) {
-				bat "node build.js -s ${sdkVersion} -m ${msBuildVersion} -o ${architecture} --sha ${gitCommit}"
-			}
-		} // timeout
-	} // dir Tool/Scripts/build
+			timeout(45) {
+				echo "Building for ${architecture} ${sdkVersion}"
+				def raw = bat(returnStdout: true, script: "echo %JavaScriptCore_${sdkVersion}_HOME%").trim()
+				def jscHome = raw.split('\n')[-1]
+				echo "Setting JavaScriptCore_HOME to ${jscHome}"
+				withEnv(["JavaScriptCore_HOME=${jscHome}"]) {
+					bat "node build.js -s ${sdkVersion} -m ${msBuildVersion} -o ${architecture} --sha ${gitCommit}"
+				}
+			} // timeout
+		} // dir Tool/Scripts/build
+	} // nodejs
 	archiveArtifacts artifacts: 'dist/**/*'
 } // def build
 
-def unitTests(target, branch, testSuiteBranch) {
+def unitTests(target, branch, testSuiteBranch, nodeVersion) {
 	def defaultEmulatorID = '10-0-1'
-	// unarchive mapping: ['dist/' : '.']
-	// dir('Tools/Scripts/build') {
-	// 	echo 'Setting up SDK'
-	// 	bat 'npm install .'
-	// 	bat "node setupSDK.js --branch ${branch}"
-	// }
+	// unarchive mapping: ['dist/' : '.'] // copy in built SDK from dist/ folder (from Build stage)
+	nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
+		bat 'npm install -g npm@5.4.1' // Install NPM 5.4.1
+		// dir('Tools/Scripts/build') {
+		// 	echo 'Setting up SDK'
+		// 	bat 'npm install .'
+		// 	bat "node setupSDK.js --branch ${branch}"
+		// }
 
-	// if our test suite already exists, delete it
-	bat 'if exist titanium-mobile-mocha-suite rmdir titanium-mobile-mocha-suite /Q /S'
-	// clone the tests suite fresh
-	// FIXME Clone once on initial node and use stash/unstash to ensure all OSes use exact same checkout revision
-	dir('titanium-mobile-mocha-suite') {
-		// TODO Do a shallow clone, using same credentials as from scm object
-		git changelog: false, poll: false, credentialsId: 'd05dad3c-d7f9-4c65-9cb6-19fef98fc440', url: 'https://github.com/appcelerator/titanium-mobile-mocha-suite.git', branch: testSuiteBranch
-	}
-
-	dir('titanium-mobile-mocha-suite/scripts') {
-		bat 'npm install .'
-		echo "${target}"
-		try {
-			if ('ws-local'.equals(target)){
-				echo "Running tests on ws-local"
-				// bat "node test.js -p windows -T ${target} --skip-sdk-install --cleanup"
-				bat "node test.js -p windows -T ${target}"
-			} else if ('wp-emulator'.equals(target)) {
-				echo "Running tests on wp-emulator"
-				// FIXME Need to see if the emulators are set up paired/dev mode/checkpoint and all have same id
-				// There could be 10.0.10240/10586/14393/15063 emulators on the boxes!
-				// Seems like "10.0.14393.0 WVGA 4 inch 512MB" is good on WinGin-03, which is 10-0-1. Has only 10.0.14393 emulators for Windows 10
-				// Seems like "10.0.10586.0 WVGA 4 inch 512MB" is good on WinGin04, which is 10-0-1. Has both 10.0.10586 and 10.0.14393 emulators for Windows 10
-				// Seems like "10.0.14393.0 WVGA 4 inch 512MB" is good on WinGin-02, which is 10-0-1. Has only 10.0.14393 emulators for Windows 10
-				// Seems like "10.0.14393.0 WVGA 4 inch 512MB" and maybe "10.0.14393.0 WXGA 4.5 inch 512MB" is good on WinGin10, WVGA is 10-0-1. Has only 10.0.14393 emulators for Windows 10
-				// bat "node test.js -p windows -T ${target} -C ${defaultEmulatorID} --skip-sdk-install --cleanup"
-				bat "node test.js -p windows -T ${target} -C ${defaultEmulatorID}"
-			}
-		} catch (e) {
-			echo "${e}"
-			throw e
-		} finally {
-			if ('ws-local'.equals(target)){
-				bat 'taskkill /IM mocha.exe /F 2> nul'
-			} else if ('wp-emulator'.equals(target)) {
-				bat 'taskkill /IM xde.exe /F 2> nul'
-			}
+		// if our test suite already exists, delete it
+		bat 'if exist titanium-mobile-mocha-suite rmdir titanium-mobile-mocha-suite /Q /S'
+		// clone the tests suite fresh
+		// FIXME Clone once on initial node and use stash/unstash to ensure all OSes use exact same checkout revision
+		dir('titanium-mobile-mocha-suite') {
+			// TODO Do a shallow clone, using same credentials as from scm object
+			git changelog: false, poll: false, credentialsId: 'd05dad3c-d7f9-4c65-9cb6-19fef98fc440', url: 'https://github.com/appcelerator/titanium-mobile-mocha-suite.git', branch: testSuiteBranch
 		}
-		junit 'junit.*.xml'
-	} // dir 'titanium-mobile-mocha-suite/scripts
+
+		dir('titanium-mobile-mocha-suite/scripts') {
+			bat 'npm install .'
+			echo "Running tests on ${target}"
+			try {
+
+				if ('ws-local'.equals(target)) {
+					// bat "node test.js -p windows -T ${target} --skip-sdk-install --cleanup"
+					bat "node test.js -p windows -T ${target}"
+				} else if ('wp-emulator'.equals(target)) {
+					// bat "node test.js -p windows -T ${target} -C ${defaultEmulatorID} --skip-sdk-install --cleanup"
+					bat "node test.js -p windows -T ${target} -C ${defaultEmulatorID}"
+				}
+			} finally {
+				// kill the emulator/app
+				if ('ws-local'.equals(target)) {
+					bat 'taskkill /IM mocha.exe /F 2> nul'
+				} else if ('wp-emulator'.equals(target)) {
+					bat 'taskkill /IM xde.exe /F 2> nul'
+				}
+			}
+			junit 'junit.*.xml'
+		} // dir 'titanium-mobile-mocha-suite/scripts
+	} // nodejs
 } // def unitTests
 
 // wrap in timestamps
 timestamps {
-	node('npm && node') {
+	node('git') {
 		stage('Checkout') {
 			// checkout scm
 			// Hack for JENKINS-37658 - see https://support.cloudbees.com/hc/en-us/articles/226122247-How-to-Customize-Checkout-for-Pipeline-Multibranch
@@ -107,7 +106,7 @@ timestamps {
 			// Stash our source code/scripts so we don't need to checkout again?
 			stash name: 'sources', includes: '**', excludes: 'apidoc/**,test/**,Examples/**'
 		} // Checkout stage
-		//
+
 		// stage('Docs') {
 		// 	if (isUnix()) {
 		// 		sh 'mkdir -p dist/windows/doc'
@@ -115,13 +114,18 @@ timestamps {
 		// 		bat 'mkdir dist\\\\windows\\\\doc'
 		// 	}
 		// 	echo 'Generating docs'
-		// 	dir('apidoc') {
-		// 		if (isUnix()) {
-		// 			sh 'npm install .'
-		// 			sh 'node ti_win_yaml.js'
-		// 		} else {
-		// 			bat 'call npm install .'
-		// 			bat 'call node ti_win_yaml.js'
+		//
+		// 	nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
+		// 		dir('apidoc') {
+		// 			if (isUnix()) {
+		// 				sh 'npm install -g npm@5.4.1'
+		// 				sh 'npm install .'
+		// 				sh 'node ti_win_yaml.js'
+		// 			} else {
+		// 				bat 'call npm install -g npm@5.4.1'
+		// 				bat 'call npm install .'
+		// 				bat 'call node ti_win_yaml.js'
+		// 			}
 		// 		}
 		// 	}
 		// 	echo 'copying generated docs to dist folder'
@@ -149,13 +153,13 @@ timestamps {
 	// stage('Build') {
 	// 	parallel(
 	// 		'Windows 10 x86': {
-	// 			node('msbuild-14 && vs2015 && hyper-v && windows-sdk-10 && npm && node && cmake && jsc') {
-	// 				build('10.0', '14.0', 'WindowsStore-x86', gitCommit)
+	// 			node('msbuild-14 && vs2015 && windows-sdk-10 && cmake && jsc') {
+	// 				build('10.0', '14.0', 'WindowsStore-x86', gitCommit, nodeVersion)
 	// 			}
 	// 		},
 	// 		'Windows 10 ARM': {
-	// 			node('msbuild-14 && vs2015 && hyper-v && windows-sdk-10 && npm && node && cmake && jsc') {
-	// 				build('10.0', '14.0', 'WindowsStore-ARM', gitCommit)
+	// 			node('msbuild-14 && vs2015 && windows-sdk-10 && cmake && jsc') {
+	// 				build('10.0', '14.0', 'WindowsStore-ARM', gitCommit, nodeVersion)
 	// 			}
 	// 		},
 	// 		failFast: true
@@ -163,16 +167,16 @@ timestamps {
 	// } // Stage build
 
 	stage('Test') {
+		def testSuiteBranch = 'windows' // TODO Make this = targetBranch
 		parallel(
 			'ws-local': {
-				// FIXME This is specifically tied to Win-Gin10 for stability
-				node('msbuild-14 && vs2015 && hyper-v && windows-sdk-10 && npm && node && cmake && jsc && Win-Gin10') {
-					unitTests('ws-local', targetBranch, 'windows')
+				node('msbuild-14 && vs2015 && windows-sdk-10 && cmake') {
+					unitTests('ws-local', targetBranch, testSuiteBranch, nodeVersion)
 				}
 			},
 			'wp-emulator': {
-				node('msbuild-14 && vs2015 && hyper-v && windows-sdk-10 && npm && node && cmake && jsc') {
-					unitTests('wp-emulator', targetBranch, 'windows')
+				node('msbuild-14 && vs2015 && hyper-v && windows-sdk-10 && cmake') {
+					unitTests('wp-emulator', targetBranch, testSuiteBranch, nodeVersion)
 				}
 			}
 		)
