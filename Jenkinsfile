@@ -18,6 +18,10 @@ def build(sdkVersion, msBuildVersion, architecture, gitCommit, nodeVersion) {
 
 	// nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
 	// 	bat 'npm install -g npm@5.4.1' // Install NPM 5.4.1
+	// 	def nodeHome = tool(name: "node ${nodeVersion}", type: 'nodejs')
+	// 	echo nodeHome
+	// 	bat "netsh advfirewall firewall add rule name=\"Node ${nodeVersion}\ TCP" program=\"${nodeHome}\\node.exe\" dir=in action=allow protocol=TCP"
+	// 	bat "netsh advfirewall firewall add rule name=\"Node ${nodeVersion}\ UDP" program=\"${nodeHome}\\node.exe\" dir=in action=allow protocol=UDP"
 		dir('Tools/Scripts') {
 			bat 'npm install .'
 			echo "Installing JSC built for Windows ${sdkVersion}"
@@ -172,7 +176,8 @@ timestamps {
 		def testSuiteBranch = 'windows' // TODO Make this = targetBranch
 		parallel(
 			'ws-local': {
-				node('msbuild-14 && vs2015 && windows-sdk-10 && cmake && node && npm') {
+				// FIXME Pegging to Win-Gin10 for stability
+				node('msbuild-14 && vs2015 && windows-sdk-10 && cmake && node && npm && Win-Gin10') {
 					unitTests('ws-local', targetBranch, testSuiteBranch, nodeVersion)
 				}
 			},
