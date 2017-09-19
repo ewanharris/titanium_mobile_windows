@@ -390,7 +390,10 @@ namespace Titanium
 
 	void GlobalObject::clearTimeout(const unsigned& timerId) TITANIUM_NOEXCEPT
 	{
-		StopTimer(timerId);
+		//
+		// Do not stop timer here, make sure to invoke it only after callback is actually done.
+		//
+		timer_clear_set__.emplace(timerId);
 	}
 
 	unsigned GlobalObject::setInterval(JSObject&& function, const std::chrono::milliseconds& delay) TITANIUM_NOEXCEPT
@@ -410,7 +413,10 @@ namespace Titanium
 
 	void GlobalObject::clearInterval(const unsigned& timerId) TITANIUM_NOEXCEPT
 	{
-		StopTimer(timerId);
+		//
+		// Do not stop timer here, make sure to invoke it only after callback is actually done.
+		//
+		timer_clear_set__.emplace(timerId);
 	}
 
 	void GlobalObject::RegisterCallback(JSObject&& function, const unsigned& timerId) TITANIUM_NOEXCEPT
@@ -447,6 +453,10 @@ namespace Titanium
 			if (clearWhenDone) {
 				clearTimeout(timerId);
 			}
+
+			if (timer_clear_set__.find(timerId) != timer_clear_set__.end()) {
+				StopTimer(timerId);
+			}
 		} TITANIUM_EXCEPTION_CATCH_END
 	}
 
@@ -473,6 +483,7 @@ namespace Titanium
 
 			TITANIUM_ASSERT(timer_callback_map__.find(timerId) != timer_callback_map__.end());
 			timer_callback_map__.erase(timerId);
+			timer_clear_set__.erase(timerId);
 		} else {
 			TITANIUM_LOG_WARN("GlobalObject::clearTimeout: timerId ", timerId, " is not registered");
 		}

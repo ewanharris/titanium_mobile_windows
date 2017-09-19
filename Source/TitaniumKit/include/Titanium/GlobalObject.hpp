@@ -321,6 +321,7 @@ namespace Titanium
 		std::string currentDir__;
 		std::unordered_map<unsigned, std::shared_ptr<Timer>> timer_map__;
 		std::unordered_map<unsigned, JSObject> timer_callback_map__;
+		std::unordered_set<unsigned> timer_clear_set__;
 
 		static std::atomic<unsigned> timer_id_generator__;
 #pragma warning(pop)
