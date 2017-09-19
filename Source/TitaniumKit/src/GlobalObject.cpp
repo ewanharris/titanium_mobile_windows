@@ -380,8 +380,7 @@ namespace Titanium
 		RegisterCallback(std::move(function), timerId);
 
 		Callback_t callback = [this, timerId]() mutable {
-			InvokeCallback(timerId);
-			clearTimeout(timerId);
+			InvokeCallback(timerId, true);
 		};
 
 		StartTimer(std::move(callback), timerId, delay);
@@ -401,7 +400,7 @@ namespace Titanium
 		RegisterCallback(std::move(function), timerId);
 
 		Callback_t callback = [this, timerId]() mutable {
-			InvokeCallback(timerId);
+			InvokeCallback(timerId, false);
 		};
 
 		StartTimer(std::move(callback), timerId, delay);
@@ -427,14 +426,27 @@ namespace Titanium
 		timer_callback_map__.erase(timerId);
 	}
 
-	void GlobalObject::InvokeCallback(const unsigned& timerId) TITANIUM_NOEXCEPT
+	void GlobalObject::InvokeCallback(const unsigned& timerId, const bool& clearWhenDone) TITANIUM_NOEXCEPT
 	{
 		TITANIUM_EXCEPTION_CATCH_START{
 			const auto found = timer_callback_map__.find(timerId);
-			TITANIUM_ASSERT(found != timer_callback_map__.end());
+
+			//
+			// This could happen when clearInterval is called while setInterval is waiting for next invocation.
+			// In that case we can just ignore the callback.
+			// For setTimeout, this should not happen.
+			//
+			if (found == timer_callback_map__.end()) {
+				return;
+			}
 			auto callback = found->second;
 			TITANIUM_ASSERT(callback.IsFunction());
 			callback(get_context().get_global_object());
+
+			// We should make sure clearing the callback only after it is called.
+			if (clearWhenDone) {
+				clearTimeout(timerId);
+			}
 		} TITANIUM_EXCEPTION_CATCH_END
 	}
 

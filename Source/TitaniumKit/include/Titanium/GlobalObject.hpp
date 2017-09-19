@@ -308,7 +308,7 @@ namespace Titanium
 
 		void RegisterCallback(JSObject&& function, const unsigned& timerId) TITANIUM_NOEXCEPT;
 		void UnregisterCallback(const unsigned& timerId) TITANIUM_NOEXCEPT;
-		void InvokeCallback(const unsigned& timerId) TITANIUM_NOEXCEPT;
+		void InvokeCallback(const unsigned& timerId, const bool& clearWhenDone) TITANIUM_NOEXCEPT;
 		void StartTimer(Callback_t&& callback, const unsigned& timerId, const std::chrono::milliseconds& delay) TITANIUM_NOEXCEPT;
 		void StopTimer(const unsigned& timerId) TITANIUM_NOEXCEPT;
 
