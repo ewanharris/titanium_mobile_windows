@@ -7,7 +7,6 @@ def gitCommit = ''
 // FIXME Using the nodejs jenkins plugin introduces complications that cause us not to properly connect to the Windows Phone emulator for logs
 // Likely need to modify the firewall rules to allow traffic from the new nodejs install like we do for system install!
 def nodeVersion = '6.10.3' // NOTE that changing this requires we set up the desired version on jenkins master first!
-def testTimeout = 15 // minutes
 
 def build(sdkVersion, msBuildVersion, architecture, gitCommit, nodeVersion) {
 	unstash 'sources' // for build
@@ -71,7 +70,7 @@ def unitTests(target, branch, testSuiteBranch, nodeVersion) {
 			echo "Running tests on ${target}"
 			try {
 
-				timeout(testTimeout) {
+				timeout(20) {
 					if ('ws-local'.equals(target)) {
 						bat "node test.js -p windows -T ${target} --skip-sdk-install --cleanup"
 						// bat "node test.js -p windows -T ${target}"
