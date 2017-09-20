@@ -52,11 +52,13 @@ namespace TitaniumWindows
 
 		// dispatcher won't be found when interval equals zero
 		if (timer_found) {
+			TITANIUM_MODULE_LOG_INFO("clearTimeout canceling dispatcher: ", timerId);
 			timer_dispatcher_map__->Lookup(timerId)->Cancel();
 			timer_dispatcher_map__->Remove(timerId);
 		}
 
 		if (timer_callback_map__.find(timerId) != timer_callback_map__.end()) {
+			TITANIUM_MODULE_LOG_INFO("clearTimeout eracing callback: ", timerId);
 			timer_callback_map__.erase(timerId);
 		}
 	}
