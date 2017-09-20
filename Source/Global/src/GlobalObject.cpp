@@ -14,6 +14,7 @@
 #include <concrt.h>
 #include <boost/algorithm/string.hpp>
 #include "TitaniumWindows/Utility.hpp"
+#include "TitaniumWindows/LogForwarder.hpp"
 
 using Windows::Security::Cryptography::Core::SymmetricAlgorithmNames;
 using Windows::Security::Cryptography::Core::SymmetricKeyAlgorithmProvider;
@@ -49,7 +50,7 @@ namespace TitaniumWindows
 			const bool timer_found = timer_position != timer_dispatcher_map__.end();
 
 			if (timer_found) {
-				TITANIUM_LOG_DEBUG("clearTimeout: ", timerId);
+				TITANIUM_MODULE_LOG_INFO("clearTimeout: ", timerId);
 				timer_position->second->Stop();
 
 				timer_dispatcher_map__.erase(timerId);
@@ -88,7 +89,7 @@ namespace TitaniumWindows
 			dispatcher_timer->Tick += ref new Windows::Foundation::EventHandler<Platform::Object^>([this, timerId, delay, isSetTimeout](Platform::Object^, Platform::Object^) {
 				TitaniumWindows::Utility::RunOnUIThread([this, timerId, isSetTimeout, delay]() {
 					TITANIUM_EXCEPTION_CATCH_START {
-						TITANIUM_LOG_DEBUG((isSetTimeout ? "setTimeout" : "setInterval"), ": id=", timerId, " delay=", delay.count());
+						TITANIUM_MODULE_LOG_INFO((isSetTimeout ? "setTimeout" : "setInterval"), ": id=", timerId, " delay=", delay.count());
 						const auto found = timer_callback_map__.find(timerId);
 
 						//
@@ -96,7 +97,7 @@ namespace TitaniumWindows
 						// In that case we can just ignore the callback.
 						//
 						if (found == timer_callback_map__.end()) {
-							TITANIUM_LOG_DEBUG("setInterval/Timeout is cleared while waiting for invocation: ", timerId);
+							TITANIUM_MODULE_LOG_INFO("setInterval/Timeout is cleared while waiting for invocation: ", timerId);
 							return;
 						}
 
