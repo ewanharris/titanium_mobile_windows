@@ -26,12 +26,15 @@ var path = require('path'),
 	DEFAULT_DEVICE_ID = '8-1-1',
 	WP_EMULATOR = 'wp-emulator',
 	MAX_RETRIES = 3,
+	MAX_INSTALL_RETRIES = 3,
+	DEFAULT_BRANCH = 'master',
 	// Global vars
 	hadWindowsSDK = false,
 	projectDir = path.join(__dirname, 'mocha'),
 	testResults,
 	jsonResults,
-	sdkRegex = /^(8\.1|10\.0)(\.\d+)*/;
+	sdkRegex = /^(8\.1|10\.0)(\.\d+)*/,
+	installRetries = 0;
 
 /**
  * Installs the latest SDK from master branch remotely, sets it as the default
@@ -42,7 +45,8 @@ var path = require('path'),
  **/
 function installSDK(branch, next) {
 	var prc = spawn('node', [titanium, 'sdk', 'install', '-b', branch, '-d', '--no-colors']),
-		sdkVersion;
+		sdkVersion,
+		retryWithDefault = false;
 	prc.stdout.on('data', function (data) {
 		var value = data.toString().trim(),
 			regexp = /You're up\-to\-date\. Version (\d+\.\d+\.\d+\.v\d+)/, // when SDK is already installed
@@ -57,12 +61,24 @@ function installSDK(branch, next) {
 		console.log(value);
 	});
 	prc.stderr.on('data', function (data) {
-		console.error(data.toString().trim());
+		var noExistRegexp = /Branch "\w+" does not exist/,
+			value = data.toString().trim();
+		if (value.match(noExistRegexp)) {
+			retryWithDefault = true;
+		}
+		console.log(value);
 	});
 
 	prc.on('close', function (code) {
 		if (code != 0) {
-			next("Failed to install SDK. Exit code: " + code);
+			if(retryWithDefault && installRetries <= MAX_INSTALL_RETRIES) {
+				installRetries++;
+				console.log('Failed to find branch, retrying ' + installRetries + ' out of ' + MAX_INSTALL_RETRIES);
+				console.log('Using ' + DEFAULT_BRANCH + ' instead of ' + branch);
+				installSDK(DEFAULT_BRANCH, next);
+			} else {
+				next("Failed to install SDK. Exit code: " + code);
+			}
 		} else {
 			console.log("Making sure " + sdkVersion + " is selected");
 			var selectPrc = spawn('node', [titanium, 'sdk', 'select', sdkVersion]);
