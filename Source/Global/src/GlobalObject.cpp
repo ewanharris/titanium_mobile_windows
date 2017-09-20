@@ -67,10 +67,16 @@ namespace TitaniumWindows
 		clearTimeout(timerId);
 	}
 
-	unsigned GlobalObject::invokeTimerCallback(JSObject& function, const std::chrono::milliseconds& delay, const bool isSetTimeout) TITANIUM_NOEXCEPT
+	unsigned GlobalObject::invokeTimerCallback(JSObject& function, const std::chrono::milliseconds& _interval, const bool isSetTimeout) TITANIUM_NOEXCEPT
 	{
 		const auto timerId = timer_id_generator__++;
 		timer_callback_map__.emplace(timerId, function);
+
+		std::chrono::milliseconds delay = _interval;
+		// Avoid zero interval
+		if (delay.count() == 0) {
+			delay = std::chrono::milliseconds(static_cast<std::chrono::milliseconds::rep>(100));
+		}
 
 		TITANIUM_MODULE_LOG_INFO("Pushing ", (isSetTimeout ? "setTimeout" : "setInterval"), ": id=", timerId, " delay=", delay.count());
 
@@ -93,29 +99,27 @@ namespace TitaniumWindows
 			timer_dispatcher_map__.emplace(timerId, dispatcher_timer);
 
 			dispatcher_timer->Tick += ref new Windows::Foundation::EventHandler<Platform::Object^>([this, timerId, delay, isSetTimeout](Platform::Object^, Platform::Object^) {
-				TitaniumWindows::Utility::RunOnUIThread([this, timerId, isSetTimeout, delay]() {
-					TITANIUM_EXCEPTION_CATCH_START {
-						TITANIUM_MODULE_LOG_INFO((isSetTimeout ? "setTimeout" : "setInterval"), ": id=", timerId, " delay=", delay.count());
-						const auto found = timer_callback_map__.find(timerId);
+				TITANIUM_EXCEPTION_CATCH_START {
+					TITANIUM_MODULE_LOG_INFO((isSetTimeout ? "setTimeout" : "setInterval"), ": id=", timerId, " delay=", delay.count());
+					const auto found = timer_callback_map__.find(timerId);
 
-						//
-						// This could happen when setInterval/Timeout is cleared while waiting for invocation.
-						// In that case we can just ignore the callback.
-						//
-						if (found == timer_callback_map__.end()) {
-							TITANIUM_MODULE_LOG_INFO("setInterval/Timeout is cleared while waiting for invocation: ", timerId);
-							return;
-						}
+					//
+					// This could happen when setInterval/Timeout is cleared while waiting for invocation.
+					// In that case we can just ignore the callback.
+					//
+					if (found == timer_callback_map__.end()) {
+						TITANIUM_MODULE_LOG_INFO("setInterval/Timeout is cleared while waiting for invocation: ", timerId);
+						return;
+					}
 
-						auto callback = found->second;
-						TITANIUM_ASSERT(callback.IsFunction());
-						callback(get_context().get_global_object());
+					auto callback = found->second;
+					TITANIUM_ASSERT(callback.IsFunction());
+					callback(get_context().get_global_object());
 
-						if (isSetTimeout) {
-							clearTimeout(timerId);
-						}
-					} TITANIUM_EXCEPTION_CATCH_END
-				});
+					if (isSetTimeout) {
+						clearTimeout(timerId);
+					}
+				} TITANIUM_EXCEPTION_CATCH_END
 			});
 
 			dispatcher_timer->Start();
