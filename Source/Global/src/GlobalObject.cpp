@@ -45,6 +45,8 @@ namespace TitaniumWindows
 
 	void GlobalObject::clearTimeout(const unsigned& timerId) TITANIUM_NOEXCEPT
 	{
+		TITANIUM_MODULE_LOG_INFO("Pushing clearTimeout: ", timerId);
+
 		TitaniumWindows::Utility::RunOnUIThread([this, timerId]() {
 			const auto timer_position = timer_dispatcher_map__.find(timerId);
 			const bool timer_found = timer_position != timer_dispatcher_map__.end();
@@ -70,7 +72,11 @@ namespace TitaniumWindows
 		const auto timerId = timer_id_generator__++;
 		timer_callback_map__.emplace(timerId, function);
 
+		TITANIUM_MODULE_LOG_INFO("Pushing ", (isSetTimeout ? "setTimeout" : "setInterval"), ": id=", timerId, " delay=", delay.count());
+
 		TitaniumWindows::Utility::RunOnUIThread([this, timerId, delay, function, isSetTimeout]() {
+
+			TITANIUM_MODULE_LOG_INFO("Dispatching ", (isSetTimeout ? "setTimeout" : "setInterval"), ": id=", timerId, " delay=", delay.count());
 
 			// A Windows::Foundation::TimeSpan is a time period expressed in
 			// 100-nanosecond units.
