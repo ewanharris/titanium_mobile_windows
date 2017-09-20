@@ -48,14 +48,18 @@ namespace TitaniumWindows
 		TITANIUM_MODULE_LOG_INFO("Pushing clearTimeout: ", timerId);
 
 		TitaniumWindows::Utility::RunOnUIThread([this, timerId]() {
+			TITANIUM_MODULE_LOG_INFO("clearTimeout: ", timerId);
+
 			const auto timer_position = timer_dispatcher_map__.find(timerId);
 			const bool timer_found = timer_position != timer_dispatcher_map__.end();
 
+			// dispatcher won't be found when interval equals zero
 			if (timer_found) {
-				TITANIUM_MODULE_LOG_INFO("clearTimeout: ", timerId);
 				timer_position->second->Stop();
-
 				timer_dispatcher_map__.erase(timerId);
+			}
+
+			if (timer_callback_map__.find(timerId) != timer_callback_map__.end()) {
 				timer_callback_map__.erase(timerId);
 			}
 		});
@@ -67,16 +71,10 @@ namespace TitaniumWindows
 		clearTimeout(timerId);
 	}
 
-	unsigned GlobalObject::invokeTimerCallback(JSObject& function, const std::chrono::milliseconds& _interval, const bool isSetTimeout) TITANIUM_NOEXCEPT
+	unsigned GlobalObject::invokeTimerCallback(JSObject& function, const std::chrono::milliseconds& delay, const bool isSetTimeout) TITANIUM_NOEXCEPT
 	{
 		const auto timerId = timer_id_generator__++;
 		timer_callback_map__.emplace(timerId, function);
-
-		std::chrono::milliseconds delay = _interval;
-		// Avoid zero interval
-		if (delay.count() == 0) {
-			delay = std::chrono::milliseconds(static_cast<std::chrono::milliseconds::rep>(100));
-		}
 
 		TITANIUM_MODULE_LOG_INFO("Pushing ", (isSetTimeout ? "setTimeout" : "setInterval"), ": id=", timerId, " delay=", delay.count());
 
@@ -84,22 +82,8 @@ namespace TitaniumWindows
 
 			TITANIUM_MODULE_LOG_INFO("Dispatching ", (isSetTimeout ? "setTimeout" : "setInterval"), ": id=", timerId, " delay=", delay.count());
 
-			// A Windows::Foundation::TimeSpan is a time period expressed in
-			// 100-nanosecond units.
-			//
-			// Reference:
-			// http://msdn.microsoft.com/en-us/library/windows/apps/windows.foundation.timespan
-			std::chrono::duration<std::chrono::nanoseconds::rep, std::ratio_multiply<std::ratio<100>, std::nano>> timer_interval_ticks = delay;
-
-			Windows::Foundation::TimeSpan time_span;
-			time_span.Duration = timer_interval_ticks.count();
-			auto dispatcher_timer = ref new Windows::UI::Xaml::DispatcherTimer();
-			dispatcher_timer->Interval = time_span;
-
-			timer_dispatcher_map__.emplace(timerId, dispatcher_timer);
-
-			dispatcher_timer->Tick += ref new Windows::Foundation::EventHandler<Platform::Object^>([this, timerId, delay, isSetTimeout](Platform::Object^, Platform::Object^) {
-				TITANIUM_EXCEPTION_CATCH_START {
+			std::function<void()> run = [this, timerId, delay, isSetTimeout]() {
+				TITANIUM_EXCEPTION_CATCH_START{
 					TITANIUM_MODULE_LOG_INFO((isSetTimeout ? "setTimeout" : "setInterval"), ": id=", timerId, " delay=", delay.count());
 					const auto found = timer_callback_map__.find(timerId);
 
@@ -120,6 +104,32 @@ namespace TitaniumWindows
 						clearTimeout(timerId);
 					}
 				} TITANIUM_EXCEPTION_CATCH_END
+			};
+
+			//
+			// Invoke callback immediately when interval equals zero
+			//
+			if (delay.count() == 0) {
+				run();
+				return;
+			}
+
+			// A Windows::Foundation::TimeSpan is a time period expressed in
+			// 100-nanosecond units.
+			//
+			// Reference:
+			// http://msdn.microsoft.com/en-us/library/windows/apps/windows.foundation.timespan
+			std::chrono::duration<std::chrono::nanoseconds::rep, std::ratio_multiply<std::ratio<100>, std::nano>> timer_interval_ticks = delay;
+
+			Windows::Foundation::TimeSpan time_span;
+			time_span.Duration = timer_interval_ticks.count();
+			auto dispatcher_timer = ref new Windows::UI::Xaml::DispatcherTimer();
+			dispatcher_timer->Interval = time_span;
+
+			timer_dispatcher_map__.emplace(timerId, dispatcher_timer);
+
+			dispatcher_timer->Tick += ref new Windows::Foundation::EventHandler<Platform::Object^>([this, run](Platform::Object^, Platform::Object^) {
+				run();
 			});
 
 			dispatcher_timer->Start();
