@@ -71,9 +71,10 @@ namespace TitaniumWindows
 		const auto timerId = timer_id_generator__++;
 		timer_callback_map__.emplace(timerId, function);
 
-		TITANIUM_MODULE_LOG_INFO("Dispatching ", (isSetTimeout ? "setTimeout" : "setInterval"), ": id=", timerId, " delay=", delay.count());
+		TITANIUM_MODULE_LOG_INFO("Pushing ", (isSetTimeout ? "setTimeout" : "setInterval"), ": id=", timerId, " delay=", delay.count());
 
 		std::function<void()> run = [this, timerId, delay, function, isSetTimeout]() {
+			TITANIUM_MODULE_LOG_INFO("Dispatching ", (isSetTimeout ? "setTimeout" : "setInterval"), ": id=", timerId, " delay=", delay.count());
 			TitaniumWindows::Utility::RunOnUIThread([this, timerId, delay, function, isSetTimeout]() {
 				TITANIUM_EXCEPTION_CATCH_START{
 					TITANIUM_MODULE_LOG_INFO((isSetTimeout ? "setTimeout" : "setInterval"), ": id=", timerId, " delay=", delay.count());
