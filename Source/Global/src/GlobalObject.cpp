@@ -12,6 +12,7 @@
 #include <ratio>
 #include <sstream>
 #include <concrt.h>
+#include <collection.h>
 #include <boost/algorithm/string.hpp>
 #include "TitaniumWindows/Utility.hpp"
 #include "TitaniumWindows/LogForwarder.hpp"
@@ -50,13 +51,12 @@ namespace TitaniumWindows
 		TitaniumWindows::Utility::RunOnUIThread([this, timerId]() {
 			TITANIUM_MODULE_LOG_INFO("clearTimeout: ", timerId);
 
-			const auto timer_position = timer_dispatcher_map__.find(timerId);
-			const bool timer_found = timer_position != timer_dispatcher_map__.end();
+			const bool timer_found = timer_dispatcher_map__->HasKey(timerId);
 
 			// dispatcher won't be found when interval equals zero
 			if (timer_found) {
-				timer_position->second->Stop();
-				timer_dispatcher_map__.erase(timerId);
+				timer_dispatcher_map__->Lookup(timerId)->Stop();
+				timer_dispatcher_map__->Remove(timerId);
 			}
 
 			if (timer_callback_map__.find(timerId) != timer_callback_map__.end()) {
@@ -126,7 +126,7 @@ namespace TitaniumWindows
 			auto dispatcher_timer = ref new Windows::UI::Xaml::DispatcherTimer();
 			dispatcher_timer->Interval = time_span;
 
-			timer_dispatcher_map__.emplace(timerId, dispatcher_timer);
+			timer_dispatcher_map__->Insert(timerId, dispatcher_timer);
 
 			dispatcher_timer->Tick += ref new Windows::Foundation::EventHandler<Platform::Object^>([this, run](Platform::Object^, Platform::Object^) {
 				run();
@@ -314,6 +314,7 @@ namespace TitaniumWindows
 	GlobalObject::GlobalObject(const JSContext& js_context) TITANIUM_NOEXCEPT
 	    : Titanium::GlobalObject(js_context),
 		seed__(nullptr)
+		, timer_dispatcher_map__(ref new Platform::Collections::Map<unsigned, Windows::UI::Xaml::DispatcherTimer^>())
 	{
 		TITANIUM_LOG_DEBUG("GlobalObject::ctor");
 	}
