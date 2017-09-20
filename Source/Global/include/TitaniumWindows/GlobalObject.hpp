@@ -57,7 +57,7 @@ namespace TitaniumWindows
 		std::unordered_map<std::string, JSValue> native_module_cache__;
 		std::function<JSValue(const JSContext& js_context, const std::string&)> native_module_requireHook__;
 
-		Windows::Foundation::Collections::IMap<unsigned, Windows::UI::Xaml::DispatcherTimer^>^ timer_dispatcher_map__;
+		Windows::Foundation::Collections::IMap<unsigned, Windows::System::Threading::ThreadPoolTimer^>^ timer_dispatcher_map__;
 		std::unordered_map<unsigned, JSObject> timer_callback_map__;
 		static std::atomic<unsigned> timer_id_generator__;
 
