@@ -50,11 +50,11 @@ def unitTests(target, branch, testSuiteBranch, nodeVersion) {
 	unarchive mapping: ['dist/' : '.'] // copy in built SDK from dist/ folder (from Build stage)
 	// nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
 	// 	bat 'npm install -g npm@5.4.1' // Install NPM 5.4.1
-		dir('Tools/Scripts/build') {
-			echo 'Setting up SDK'
-			bat 'npm install .'
-			bat "node setupSDK.js --branch ${branch}"
-		}
+		// dir('Tools/Scripts/build') {
+		// 	echo 'Setting up SDK'
+		// 	bat 'npm install .'
+		// 	bat "node setupSDK.js --branch ${branch}"
+		// }
 
 		// if our test suite already exists, delete it
 		bat 'if exist titanium-mobile-mocha-suite rmdir titanium-mobile-mocha-suite /Q /S'
@@ -72,11 +72,11 @@ def unitTests(target, branch, testSuiteBranch, nodeVersion) {
 
 				timeout(20) {
 					if ('ws-local'.equals(target)) {
-						bat "node test.js -p windows -T ${target} --skip-sdk-install --cleanup"
-						// bat "node test.js -p windows -T ${target}"
+						// bat "node test.js -p windows -T ${target} --skip-sdk-install --cleanup"
+						bat "node test.js -p windows -T ${target}"
 					} else if ('wp-emulator'.equals(target)) {
-						bat "node test.js -p windows -T ${target} -C ${defaultEmulatorID} --skip-sdk-install --cleanup"
-						// bat "node test.js -p windows -T ${target} -C ${defaultEmulatorID}"
+						// bat "node test.js -p windows -T ${target} -C ${defaultEmulatorID} --skip-sdk-install --cleanup"
+						bat "node test.js -p windows -T ${target} -C ${defaultEmulatorID}"
 					}
 				}
 			} finally {
@@ -157,21 +157,21 @@ timestamps {
 	// Trigger titanium_mobile if we're on a mainline branch
 	def triggerDownstream = isMainlineBranch
 
-	stage('Build') {
-		parallel(
-			'Windows 10 x86': {
-				node('msbuild-14 && vs2015 && windows-sdk-10 && node && npm && cmake && jsc') {
-					build('10.0', '14.0', 'WindowsStore-x86', gitCommit, nodeVersion)
-				}
-			},
-			'Windows 10 ARM': {
-				node('msbuild-14 && vs2015 && windows-sdk-10 && node && npm && cmake && jsc') {
-					build('10.0', '14.0', 'WindowsStore-ARM', gitCommit, nodeVersion)
-				}
-			},
-			failFast: true
-		)
-	} // Stage build
+	// stage('Build') {
+	// 	parallel(
+	// 		'Windows 10 x86': {
+	// 			node('msbuild-14 && vs2015 && windows-sdk-10 && node && npm && cmake && jsc') {
+	// 				build('10.0', '14.0', 'WindowsStore-x86', gitCommit, nodeVersion)
+	// 			}
+	// 		},
+	// 		'Windows 10 ARM': {
+	// 			node('msbuild-14 && vs2015 && windows-sdk-10 && node && npm && cmake && jsc') {
+	// 				build('10.0', '14.0', 'WindowsStore-ARM', gitCommit, nodeVersion)
+	// 			}
+	// 		},
+	// 		failFast: true
+	// 	)
+	// } // Stage build
 
 	stage('Test') {
 		def testSuiteBranch = 'windows' // TODO Make this = targetBranch
