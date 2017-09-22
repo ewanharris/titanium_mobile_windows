@@ -47,7 +47,7 @@ def build(sdkVersion, msBuildVersion, architecture, gitCommit, nodeVersion) {
 
 def unitTests(target, branch, testSuiteBranch, nodeVersion) {
 	def defaultEmulatorID = '10-0-1'
-	unarchive mapping: ['dist/' : '.'] // copy in built SDK from dist/ folder (from Build stage)
+	// unarchive mapping: ['dist/' : '.'] // copy in built SDK from dist/ folder (from Build stage)
 	// nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
 	// 	bat 'npm install -g npm@5.4.1' // Install NPM 5.4.1
 		// dir('Tools/Scripts/build') {
