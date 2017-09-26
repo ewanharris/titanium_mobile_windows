@@ -73,10 +73,8 @@ def unitTests(target, branch, testSuiteBranch, nodeVersion) {
 				timeout(20) {
 					if ('ws-local'.equals(target)) {
 						bat "node test.js -p windows -T ${target} --skip-sdk-install --cleanup"
-						// bat "node test.js -p windows -T ${target}"
 					} else if ('wp-emulator'.equals(target)) {
 						bat "node test.js -p windows -T ${target} -C ${defaultEmulatorID} --skip-sdk-install --cleanup"
-						// bat "node test.js -p windows -T ${target} -C ${defaultEmulatorID}"
 					}
 				}
 			} finally {
@@ -114,35 +112,35 @@ timestamps {
 			stash name: 'sources', includes: '**', excludes: 'apidoc/**,test/**,Examples/**'
 		} // Checkout stage
 
-		// stage('Docs') {
-		// 	if (isUnix()) {
-		// 		sh 'mkdir -p dist/windows/doc'
-		// 	} else {
-		// 		bat 'mkdir dist\\\\windows\\\\doc'
-		// 	}
-		// 	echo 'Generating docs'
-		//
-		// 	nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
-		// 		dir('apidoc') {
-		// 			if (isUnix()) {
-		// 				sh 'npm install -g npm@5.4.1'
-		// 				sh 'npm install .'
-		// 				sh 'node ti_win_yaml.js'
-		// 			} else {
-		// 				bat 'call npm install -g npm@5.4.1'
-		// 				bat 'call npm install .'
-		// 				bat 'call node ti_win_yaml.js'
-		// 			}
-		// 		}
-		// 	}
-		// 	echo 'copying generated docs to dist folder'
-		// 	if (isUnix()) {
-		// 		sh 'mv apidoc/Titanium dist/windows/doc/Titanium'
-		// 	} else {
-		// 		bat '(robocopy apidoc\\\\Titanium dist\\\\windows\\\\doc\\\\Titanium /e) ^& IF %ERRORLEVEL% LEQ 3 cmd /c exit 0'
-		// 	}
-		// 	archiveArtifacts artifacts: 'dist/**/*'
-		// } // stage('Docs')
+		stage('Docs') {
+			if (isUnix()) {
+				sh 'mkdir -p dist/windows/doc'
+			} else {
+				bat 'mkdir dist\\\\windows\\\\doc'
+			}
+			echo 'Generating docs'
+
+			nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
+				dir('apidoc') {
+					if (isUnix()) {
+						sh 'npm install -g npm@5.4.1'
+						sh 'npm install .'
+						sh 'node ti_win_yaml.js'
+					} else {
+						bat 'call npm install -g npm@5.4.1'
+						bat 'call npm install .'
+						bat 'call node ti_win_yaml.js'
+					}
+				}
+			}
+			echo 'copying generated docs to dist folder'
+			if (isUnix()) {
+				sh 'mv apidoc/Titanium dist/windows/doc/Titanium'
+			} else {
+				bat '(robocopy apidoc\\\\Titanium dist\\\\windows\\\\doc\\\\Titanium /e) ^& IF %ERRORLEVEL% LEQ 3 cmd /c exit 0'
+			}
+			archiveArtifacts artifacts: 'dist/**/*'
+		} // stage('Docs')
 	} // node
 
 	// Are we on a PR/feature branch, or a "mainline" branch like master/6_2_X/7_0_X?
@@ -177,8 +175,7 @@ timestamps {
 		def testSuiteBranch = 'windows' // TODO Make this = targetBranch
 		parallel(
 			'ws-local': {
-				// FIXME Pegging to Win-Gin10 for stability
-				node('msbuild-14 && vs2015 && windows-sdk-10 && cmake && node && npm && Win-Gin10') {
+				node('msbuild-14 && vs2015 && windows-sdk-10 && cmake && node && npm') {
 					unitTests('ws-local', targetBranch, testSuiteBranch, nodeVersion)
 				}
 			},
