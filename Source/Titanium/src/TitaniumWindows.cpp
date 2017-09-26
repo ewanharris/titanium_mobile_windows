@@ -344,8 +344,6 @@ namespace TitaniumWindows
 
 	void Application::OnResuming(Object ^sender, Object ^args) 
 	{
-		TITANIUM_MODULE_LOG_INFO("Application::OnResuming");
-
 		// shorthand to indicate we're in background
 		js_context__.JSEvaluateScript("Ti.App.Windows.BackgroundService.suspended = false;");
 
@@ -357,8 +355,6 @@ namespace TitaniumWindows
 
 	void Application::OnSuspending(Object ^ sender, Windows::ApplicationModel::SuspendingEventArgs ^ e)
 	{
-		TITANIUM_MODULE_LOG_INFO("Application::OnSuspending");
-
 		auto deferral = e->SuspendingOperation->GetDeferral();
 
 		// shorthand to indicate we're in background
