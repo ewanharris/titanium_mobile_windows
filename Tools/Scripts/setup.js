@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Sets up a Windows machine for Titanium Mobile Windows/HAL/TitaniumKit development.
  *
@@ -12,9 +14,9 @@
  *
  * @requires node-appc
  */
-var async = require('async'),
+const async = require('async'),
 	fs = require('fs'),
-	colors = require('colors'),
+	colors = require('colors'), // eslint-disable-line no-unused-vars
 	http = require('http'),
 	path = require('path'),
 	request = require('request'),
@@ -22,7 +24,7 @@ var async = require('async'),
 	wrench = require('wrench'),
 	appc = require('node-appc'),
 	HOME = process.env.HOME || process.env.USERPROFILE || process.env.APPDATA,
-	spawn = require('child_process').spawn,
+	spawn = require('child_process').spawn, // eslint-disable-line security/detect-child-process
 	os = require('os'),
 	SYMBOLS = {
 		OK: '✓',
@@ -41,9 +43,8 @@ var async = require('async'),
 	BOOST_URL = 'http://nchc.dl.sourceforge.net/project/boost/boost/1.60.0/boost_1_60_0.zip',
 	BOOST_DIR = 'boost_1_60_0'; // directory inside zipfile
 
-
 // With node.js on Windows: use symbols available in terminal default fonts
-if ('win32' == os.platform()) {
+if (os.platform() === 'win32') {
 	SYMBOLS.OK = '\u221A';
 	SYMBOLS.ERROR = '\u00D7';
 }
@@ -51,11 +52,11 @@ if ('win32' == os.platform()) {
 function downloadURL(url, callback) {
 	console.log('Downloading %s', url.cyan);
 
-	var tempName = temp.path({ suffix: '.zip' }),
+	const tempName = temp.path({ suffix: '.zip' }),
 		tempDir = path.dirname(tempName);
 	fs.existsSync(tempDir) || wrench.mkdirSyncRecursive(tempDir);
 
-	var tempStream = fs.createWriteStream(tempName),
+	const tempStream = fs.createWriteStream(tempName),
 		req = request({ url: url });
 
 	req.pipe(tempStream);
@@ -75,7 +76,7 @@ function downloadURL(url, callback) {
 			process.exit(1);
 		} else if (req.headers['content-length']) {
 			// we know how big the file is, display the progress bar
-			var total = parseInt(req.headers['content-length']),
+			let total = parseInt(req.headers['content-length']),
 				bar;
 
 			if (!process.argv.indexOf('--quiet') && !process.argv.indexOf('--no-progress-bars')) {
@@ -91,7 +92,6 @@ function downloadURL(url, callback) {
 				bar && bar.tick(buffer.length);
 			});
 
-
 			tempStream.on('close', function () {
 				if (bar) {
 					bar.tick(total);
@@ -101,16 +101,16 @@ function downloadURL(url, callback) {
 			});
 		} else {
 			// we don't know how big the file is, display a spinner
-			var busy;
+			let busy;
 
 			if (!process.argv.indexOf('--quiet') && !process.argv.indexOf('--no-progress-bars')) {
-				busy = new appc.busyindicator;
+				busy = new appc.busyindicator();
 				busy.start();
 			}
 
 			tempStream.on('close', function () {
 				busy && busy.stop();
-				logger.log();
+				this.logger.log();
 				callback(tempName);
 			});
 		}
@@ -120,12 +120,12 @@ function downloadURL(url, callback) {
 function extract(filename, installLocation, keepFiles, callback) {
 	console.log('Extracting to %s', installLocation.cyan);
 
-	var bar;
+	let bar;
 
 	appc.zip.unzip(filename, installLocation, {
 		visitor: function (entry, i, total) {
-			if (i == 0) {
-				if(!process.argv.indexOf('--quiet') && !process.argv.indexOf('--no-progress-bars')) {
+			if (i === 0) {
+				if (!process.argv.indexOf('--quiet') && !process.argv.indexOf('--no-progress-bars')) {
 					bar = new appc.progress('  :paddedPercent [:bar]', {
 						complete: '='.cyan,
 						incomplete: '.'.grey,
@@ -158,14 +158,13 @@ function extract(filename, installLocation, keepFiles, callback) {
 function setENV(key, value, next) {
 	if (os.platform() === 'win32') {
 		// Set the env var "permanently" for user
-		var prc = spawn('setx', [key, value]);
-		//prc.stdout.on('data', function (data) {
+		const prc = spawn('setx', [ key, value ]);
+		// prc.stdout.on('data', function (data) {
 		//   console.log(data.toString());
-		//});
+		// });
 
 		prc.on('close', function (code) {
-			var setProcess;
-			if (code != 0) {
+			if (code !== 0) {
 				next('Failed to run SETX');
 			} else {
 				// FIXME Can't seem to run SET to also set for current session!
@@ -183,6 +182,12 @@ function setENV(key, value, next) {
 
 /**
  * Used to determine if there is an existing install of JSC and it's fromt he same URL as we want.
+ */
+/**
+ * [isUpToDate description]
+ * @param  {String}  destination Destination for the file
+ * @param  {String}  url         URL to be stashed
+ * @return {Boolean}             [description]
  */
 function isUpToDate(destination, url) {
 	var urlFile = path.join(destination, 'SOURCE_URL'),
@@ -233,11 +238,11 @@ function downloadIfNecessary(envKey, defaultDest, expectedDir, url, next) {
 		downloadURL(url, function (filename) {
 			// What if it _does_ exist and is out of date? We should "wipe it", or move it...
 			if (fs.existsSync(destination)) {
-				var urlFile = path.join(destination, 'SOURCE_URL');
+				const urlFile = path.join(destination, 'SOURCE_URL');
 				if (fs.existsSync(urlFile)) {
-					var contents = fs.readFileSync(urlFile);
-					var base = path.basename(contents.slice(7), '.zip');
-					var byURL = path.normalize(path.join(destination, '..', base));
+					const contents = fs.readFileSync(urlFile);
+					const base = path.basename(contents.slice(7), '.zip');
+					const byURL = path.normalize(path.join(destination, '..', base));
 					console.log('Destination for ' + url + ' already exists, moving existing directory to ' + byURL + ' before extracting.');
 					if (!fs.existsSync(byURL)) {
 						wrench.copyDirSyncRecursive(destination, byURL);
@@ -246,8 +251,8 @@ function downloadIfNecessary(envKey, defaultDest, expectedDir, url, next) {
 				wrench.rmdirSyncRecursive(destination);
 			}
 			// Extract to parent of destination...
-			var dest = path.normalize(path.join(destination, '..'));
-			extract(filename, dest, true, function() {
+			const dest = path.normalize(path.join(destination, '..'));
+			extract(filename, dest, true, function () {
 				// Need to rename the extracted directory to match our expected destination!
 				var extractedDir = path.join(dest, expectedDir);
 				wrench.copyDirSyncRecursive(extractedDir, destination);
@@ -265,51 +270,51 @@ function downloadIfNecessary(envKey, defaultDest, expectedDir, url, next) {
 
 /**
  * Downloads Boost headers from BOOST_URL if necessary, and sets BOOST_ROOT env var to it.
- * @param [url] {String} override source URL to grab Boost from.
- * @param next {Function} callback function when finished
+ * @param {String} 		[url] 	override source URL to grab Boost from
+ * @param {Function} 	next	callback function when finished
  */
 function setupBoost(url, next) {
-	if (typeof url == 'function') {
+	if (typeof url === 'function') {
 		next = url;
 		url = BOOST_URL;
 	}
 
 	console.log('Setting up Boost libraries...');
-	var boostRoot = path.join(HOME, 'boost');
+	const boostRoot = path.join(HOME, 'boost');
 	downloadIfNecessary('BOOST_ROOT', boostRoot, BOOST_DIR, url, next);
 }
 
 /**
  * Downloads GTest from GTEST_URL if necessary, and sets GTEST_ROOT env var to it.
- * @param [url] {String} override source URL to grab GTest from.
- * @param next {Function} callback function when finished
+ * @param {String} 		[url] 	override source URL to grab GTest from.
+ * @param {Function} 	next 	callback function when finished
  */
 function setupGTest(url, next) {
-	if (typeof url == 'function') {
+	if (typeof url === 'function') {
 		next = url;
 		url = GTEST_URL;
 	}
 
 	console.log('Setting up GTest...');
-	var gtestRoot = path.join(HOME, 'gtest');
+	const gtestRoot = path.join(HOME, 'gtest');
 	downloadIfNecessary('GTEST_ROOT', gtestRoot, GTEST_DIR, url, next);
 }
 
 /**
  * Downloads JavaScriptCore from JSC_URL if necessary, and sets JavaScriptCore_HOME env var to it.
- * @param sdkVersion {String} '8.1' || '10'
- * @param [url] {String} override source URL to grab JSC from.
- * @param next {Function} callback function when finished
+ * @param {String}		sdkVersion 	'8.1' || '10'
+ * @param {String}		[url] 		override source URL to grab JSC from.
+ * @param {Function} 	next 		callback function when finished
  */
 function setupJSC(sdkVersion, url, next) {
-	if (typeof url == 'function') {
+	if (typeof url === 'function') {
 		next = url;
-		url = JSC_URL;
+		url = JSC_URL; // TODO find this url or remove
 	}
 
 	console.log('Setting up JavaScriptCore pre-built libraries...');
 	// Download to directory pegged to sdk version
-	var jscHome = path.join(HOME, 'JavaScriptCore-' + sdkVersion);
+	const jscHome = path.join(HOME, 'JavaScriptCore-' + sdkVersion);
 	// Set env specific to windows sdk version
 	downloadIfNecessary('JavaScriptCore_' + sdkVersion + '_HOME', jscHome, JSC_DIR, url, function (e) {
 		if (e) {
@@ -326,11 +331,12 @@ function setupJSC(sdkVersion, url, next) {
 
 /**
  * Modifies PATH to include bin folder of included cmake.
+ * @param {Function}	next	callback function when finisheds
  **/
 function setupCMake(next) {
 	console.log('Appending included cmake to PATH...');
-	var cmakeBinPath = path.join(__dirname, '..', '..', 'cli', 'vendor', 'cmake', 'bin');
-	if (process.env.PATH.indexOf(cmakeBinPath) == -1) {
+	const cmakeBinPath = path.join(__dirname, '..', '..', 'cli', 'vendor', 'cmake', 'bin');
+	if (process.env.PATH.indexOf(cmakeBinPath) === -1) {
 		console.log('Appending %s to PATH', cmakeBinPath);
 		setENV('PATH', process.env.PATH + ';' + cmakeBinPath, next);
 	} else {
@@ -341,14 +347,14 @@ function setupCMake(next) {
 }
 
 /**
- * @param [overrides] {Object}
- * @param [overrides.boost] {String} Source URL to use for Boost
- * @param [overrides.gtest] {String} Source URL to use for GTest
- * @param [overrides.jsc] {String} Source URL to use for JavaScriptCore
- * @param callback {Function} callback function when finished
+ * @param {Object}		[overrides]			Object containing various URLs to override defaults
+ * @param {String}		[overrides.boost] 	Source URL to use for Boost
+ * @param {String}		[overrides.gtest] 	Source URL to use for GTest
+ * @param {String}		[overrides.jsc] 	Source URL to use for JavaScriptCore
+ * @param {Function} 	callback 			callback function when finished
  **/
 function setup(overrides, callback) {
-	if (typeof overrides == 'function') {
+	if (typeof overrides === 'function') {
 		callback = overrides;
 		overrides = {};
 	}
@@ -381,7 +387,7 @@ exports.setupJSC = setupJSC;
 exports.setupCMake = setupCMake;
 
 // When run as single script.
-if (module.id === ".") {
+if (module.id === '.') {
 	(function () {
 		var program = require('commander');
 
@@ -408,12 +414,12 @@ if (module.id === ".") {
 			gtest: program.gtest,
 			jsc: program.javascriptcore,
 			sdkVersion: program.sdkVersion
-		}, function (err, results) {
+		}, function (err) {
 			if (err) {
 				console.error((SYMBOLS.ERROR + ' ' + err.toString()).red);
 				process.exit(1);
 			}
 			process.exit(0);
 		});
-	})();
+	}());
 }
