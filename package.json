@@ -14,7 +14,6 @@
 		"windows store",
 		"winstore"
 	],
-	"version": "__VERSION__",
 	"author": "Appcelerator, Inc. <info@appcelerator.com>",
 	"maintainers": [
 		"Matt Langston <mlangston@appcelerator.com>",
@@ -38,5 +37,14 @@
 		"type": "git",
 		"url": "git://github.com/appcelerator/titanium_mobile_windows.git"
 	},
-	"license": "Apache Public License v2"
+	"scripts": {
+		"lint": "eslint cli/"
+	},
+	"license": "Apache Public License v2",
+	"devDependencies": {
+		"grunt": "^1.0.1",
+		"grunt-appc-js": "^2.0.1",
+		"grunt-clang-format": "^1.0.0",
+		"grunt-cli": "^1.2.0"
+	}
 }
