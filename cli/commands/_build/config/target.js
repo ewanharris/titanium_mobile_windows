@@ -1,6 +1,8 @@
-var appc = require('node-appc'),
-	__ = appc.i18n(__dirname).__;
+'use strict';
 
+const appc = require('node-appc'),
+	os = require('os'),
+	__ = appc.i18n(__dirname).__;
 
 /**
  * Defines the --target option.
@@ -20,7 +22,7 @@ module.exports = function configOptionTarget(order) {
 			}
 
 			if (value === 'wp-emulator' || value === 'wp-device' || value === 'dist-phonestore') {
-				if (this.cli.argv['wp-sdk'] == undefined) {
+				if (this.cli.argv['wp-sdk'] === undefined) {
 					this.conf.options['win-sdk'].required = true;
 				}
 			}
@@ -32,17 +34,16 @@ module.exports = function configOptionTarget(order) {
 			// targeting ws-local without SDK specified, select most appropriate for platform
 			if (!this.isWindowsSDKTargetSpecified()) {
 				if (value === 'ws-local') {
-					var sdk = '10.0',
-						os = require('os').release();
+					let sdk = '10.0';
 
 					// not on Windows 10, default to 8.1 sdk
-					if (!os.startsWith('10.0')) {
+					if (!os.release().startsWith('10.0')) {
 						sdk = '8.1';
 					}
 					this.cli.argv['win-sdk'] = sdk;
 				} else if (this.windowsInfo) {
-					var defaultPlatformSdkTarget = '10.0';
-					for (var version in this.windowsInfo.windowsphone) {
+					let defaultPlatformSdkTarget = '10.0';
+					for (let version in this.windowsInfo.windowsphone) {
 						if (this.windowsInfo.windowsphone[version].selected) {
 							defaultPlatformSdkTarget = version;
 						}

@@ -1,12 +1,8 @@
-var appc = require('node-appc'),
-	async = require('async'),
-	cleanCSS = require('clean-css'),
+'use strict';
+
+const appc = require('node-appc'),
 	fs = require('fs'),
-	jsanalyze = require('node-titanium-sdk/lib/jsanalyze'),
-	os = require('os'),
 	path = require('path'),
-	ti = require('node-titanium-sdk'),
-	wrench = require('wrench'),
 	__ = appc.i18n(__dirname).__;
 
 /*
@@ -28,11 +24,11 @@ function processEncryption(next) {
 
 	// encrypt the javascript
 	var fileListing = path.join(this.buildDir, 'titanium_prep_listing.txt'),
-		args = [this.tiapp.guid, this.tiapp.id, this.buildTargetAssetsDir, '--file-listing', fileListing];
+		args = [ this.tiapp.guid, this.tiapp.id, this.buildTargetAssetsDir, '--file-listing', fileListing ];
 
 	fs.writeFileSync(fileListing, this.jsFilesToEncrypt.join('\n'));
 
-	var opts = {
+	const opts = {
 			env: appc.util.mix({}, process.env, this.jdkInfo ? {
 				// we force the JAVA_HOME so that titanium_prep doesn't complain
 				'JAVA_HOME': this.jdkInfo.home
@@ -55,7 +51,7 @@ function processEncryption(next) {
 					});
 				}
 
-				var mainCPPPath = path.join(this.buildDir, 'src', 'main.cpp'),
+				const mainCPPPath = path.join(this.buildDir, 'src', 'main.cpp'),
 					mainCPPContents = fs.readFileSync(mainCPPPath, 'utf-8')
 						.replace(/TitaniumWindows::Application\(\);/, 'TitaniumWindows::Application("' + out.trim() + '");');
 				fs.writeFileSync(mainCPPPath, mainCPPContents);

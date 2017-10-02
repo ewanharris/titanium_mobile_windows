@@ -1,7 +1,7 @@
-var appc = require('node-appc'),
+'use strict';
+
+const appc = require('node-appc'),
 	fs = require('fs'),
-	os = require('os'),
-	path = require('path'),
 	ti = require('node-titanium-sdk'),
 	wrench = require('wrench'),
 	__ = appc.i18n(__dirname).__;
@@ -212,7 +212,7 @@ function checkIfNeedToRecompile(next) {
 	fs.existsSync(this.buildManifestFile) && fs.unlinkSync(this.buildManifestFile);
 
 	next();
-};
+}
 
 /**
  * Checks that the app.js exists. This has to be done after the "build.pre.compile" event

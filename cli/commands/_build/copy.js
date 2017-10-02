@@ -1,4 +1,6 @@
-var appc = require('node-appc'),
+'use strict';
+
+const appc = require('node-appc'),
 	async = require('async'),
 	cleanCSS = require('clean-css'),
 	fs = require('fs'),
@@ -126,7 +128,7 @@ function copyResources(next) {
 	 * Check JS syntax and report errors. Mostly copied from jsanalyze
 	 */
 	function reportJSErrors(filename, contents, ex) {
-		var errmsg = [__('Failed to parse %s', filename)];
+		var errmsg = [ __('Failed to parse %s', filename) ];
 		if (ex.line) {
 			errmsg.push(__('%s [line %s, column %s]', ex.message, ex.line, ex.col));
 		} else {
@@ -138,7 +140,7 @@ function copyResources(next) {
 				errmsg.push('');
 				errmsg.push('    ' + contents[ex.line - 1].replace(/\t/g, ' '));
 				if (ex.col) {
-					var i = 0,
+					let i = 0,
 						len = ex.col,
 						buffer = '    ';
 					for (; i < len; i++) {
@@ -148,7 +150,9 @@ function copyResources(next) {
 				}
 				errmsg.push('');
 			}
-		} catch (ex2) {}
+		} catch (ex2) {
+			// Do nothing with exception
+		}
 		return errmsg.join('\n');
 	}
 
@@ -158,7 +162,7 @@ function copyResources(next) {
 			files = fs.readdirSync(src);
 		} else {
 			// we have a file, so fake a directory listing
-			files = [path.basename(src)];
+			files = [ path.basename(src) ];
 			src = path.dirname(src);
 		}
 
@@ -178,7 +182,7 @@ function copyResources(next) {
 					return next();
 				}
 
-				var isDir = fs.statSync(from).isDirectory();
+				const isDir = fs.statSync(from).isDirectory();
 
 				// check if we are ignoring this file
 				if ((isDir && ignoreRootDirs && ignoreRootDirs.indexOf(filename) !== -1) || (isDir ? ignoreDirs : ignoreFiles).test(filename)) {
@@ -196,7 +200,7 @@ function copyResources(next) {
 				// if the destination directory does not exists, create it
 				fs.existsSync(destDir) || wrench.mkdirSyncRecursive(destDir);
 
-				var ext = filename.match(extRegExp);
+				const ext = filename.match(extRegExp);
 
 				switch (ext && ext[1]) {
 					case 'css':
@@ -216,7 +220,7 @@ function copyResources(next) {
 
 					case 'html':
 						// find all js files referenced in this html file
-						var relPath = from.replace(opts.origSrc, '').replace(/\\/g, '/').replace(/^\//, '').split('/');
+						let relPath = from.replace(opts.origSrc, '').replace(/\\/g, '/').replace(/^\//, '').split('/');
 						relPath.pop(); // remove the filename
 						relPath = relPath.join('/');
 						jsanalyze.analyzeHtmlFile(from, relPath).forEach(function (file) {
@@ -240,7 +244,7 @@ function copyResources(next) {
 
 						// we use the destination file name minus the path to the assets dir as the id
 						// which will eliminate dupes
-						var id = to.replace(opts.origDest, '').replace(/\\/g, '/').replace(/^\//, '');
+						const id = to.replace(opts.origDest, '').replace(/\\/g, '/').replace(/^\//, '');
 
 						if (!jsFiles[id] || !opts || !opts.onJsConflict || opts.onJsConflict(from, to, id)) {
 							jsFiles[id] = from;
@@ -266,81 +270,81 @@ function copyResources(next) {
 			missingIcons = [
 
 			// Square24x24Logo
-			{
-				description: 'Square24x24Logo.png - Used for badge',
-				file: path.join(appIconSetDir, 'Square24x24Logo.png'),
-				width: 24,
-				height: 24,
-				required: true
-			},
+				{
+					description: 'Square24x24Logo.png - Used for badge',
+					file: path.join(appIconSetDir, 'Square24x24Logo.png'),
+					width: 24,
+					height: 24,
+					required: true
+				},
 
-			// Square44x44Logo
-			{
-				description: 'Square44x44Logo.png - Used for logo',
-				file: path.join(appIconSetDir, 'Square44x44Logo.png'),
-				width: 44,
-				height: 44,
-				required: true
-			},
+				// Square44x44Logo
+				{
+					description: 'Square44x44Logo.png - Used for logo',
+					file: path.join(appIconSetDir, 'Square44x44Logo.png'),
+					width: 44,
+					height: 44,
+					required: true
+				},
 
-			// Square71x71Logo
-			{
-				description: 'Square71x71Logo.png - Used for logo',
-				file: path.join(appIconSetDir, 'Square71x71Logo.png'),
-				width: 71,
-				height: 71,
-				required: true
-			},
+				// Square71x71Logo
+				{
+					description: 'Square71x71Logo.png - Used for logo',
+					file: path.join(appIconSetDir, 'Square71x71Logo.png'),
+					width: 71,
+					height: 71,
+					required: true
+				},
 
-			// Square150x150Logo
-			{
-				description: 'Square150x150Logo.png - Used for logo',
-				file: path.join(appIconSetDir, 'Square150x150Logo.png'),
-				width: 150,
-				height: 150,
-				required: true
-			},
+				// Square150x150Logo
+				{
+					description: 'Square150x150Logo.png - Used for logo',
+					file: path.join(appIconSetDir, 'Square150x150Logo.png'),
+					width: 150,
+					height: 150,
+					required: true
+				},
 
-			// Logo.png
-			{
-				description: 'Logo.png - Used for logo',
-				file: path.join(appIconSetDir, 'Logo.png'),
-				width: 150,
-				height: 150,
-				required: true
-			},
+				// Logo.png
+				{
+					description: 'Logo.png - Used for logo',
+					file: path.join(appIconSetDir, 'Logo.png'),
+					width: 150,
+					height: 150,
+					required: true
+				},
 
-			// StoreLogo.png
-			{
-				description: 'StoreLogo.png - Used for logo',
-				file: path.join(appIconSetDir, 'StoreLogo.png'),
-				width: 50,
-				height: 50,
-				required: true
-			},
+				// StoreLogo.png
+				{
+					description: 'StoreLogo.png - Used for logo',
+					file: path.join(appIconSetDir, 'StoreLogo.png'),
+					width: 50,
+					height: 50,
+					required: true
+				},
 
-			// SmallLogo.png
-			{
-				description: 'SmallLogo.png - Used for logo',
-				file: path.join(appIconSetDir, 'SmallLogo.png'),
-				width: 30,
-				height: 30,
-				required: true
-			}
+				// SmallLogo.png
+				{
+					description: 'SmallLogo.png - Used for logo',
+					file: path.join(appIconSetDir, 'SmallLogo.png'),
+					width: 30,
+					height: 30,
+					required: true
+				}
 
 			// TODO: Generate SplashScreen.scale-100.png?
-		],
-		md5 = function (file) {
+			];
+		function md5 (file) {
 			return crypto
 				.createHash('md5')
 				.update(fs.readFileSync(file), 'binary')
-				.digest('hex')
-		};
+				.digest('hex');
+		}
 
 		// if the app icon does not exist then check if it exists in the project root
 		// if it does not exist in project root then generate the missing icon
-		for (var i = missingIcons.length - 1; i >= 0; i--) {
-			var icon = missingIcons[i],
+		for (let i = missingIcons.length - 1; i >= 0; i--) {
+			const icon = missingIcons[i],
 				platformResourceIcon = path.join(this.projectDir, 'Resources', 'Windows', path.basename(icon.file)),
 				resourceIcon = path.join(this.projectDir, 'Resources', path.basename(icon.file));
 			if (fs.existsSync(platformResourceIcon)) {
@@ -350,24 +354,22 @@ function copyResources(next) {
 					copyFile.call(this, platformResourceIcon, icon.file);
 				}
 				missingIcons.splice(i, 1);
-			} else {
-				if (fs.existsSync(resourceIcon)) {
-					if (fs.existsSync(icon.file) && md5(icon.file) === md5(resourceIcon)) {
-						this.logger.debug(__('%s already exists, skipping...', icon.file));
-					} else {
-						copyFile.call(this, resourceIcon, icon.file);
-					}
-					missingIcons.splice(i, 1);
+			} else if (fs.existsSync(resourceIcon)) {
+				if (fs.existsSync(icon.file) && md5(icon.file) === md5(resourceIcon)) {
+					this.logger.debug(__('%s already exists, skipping...', icon.file));
 				} else {
-					this.logger.debug(__('%s missing, generating...', icon.file));
+					copyFile.call(this, resourceIcon, icon.file);
 				}
+				missingIcons.splice(i, 1);
+			} else {
+				this.logger.debug(__('%s missing, generating...', icon.file));
 			}
 		}
 
 		this.generateAppIcons(missingIcons, next);
 	}
 
-	var tasks = [
+	const tasks = [
 		// First, copy template files for CMake/MSBuild FIXME Move these into subdir so we copy only ones we need!
 		function (cb) {
 			var src = path.join(this.platformPath, 'templates', 'build');
@@ -462,10 +464,10 @@ function copyResources(next) {
 	});
 
 	// this.modules.forEach(function (module) {
-		// TODO: copy any module specific resources here
+	// TODO: copy any module specific resources here
 	// }, this);
 
-	var platformPaths = [];
+	const platformPaths = [];
 	// WARNING! This is pretty dangerous, but yes, we're intentionally copying
 	// every file from platform/windows and all modules into the build dir
 	this.modules.forEach(function (module) {
@@ -488,23 +490,23 @@ function copyResources(next) {
 		this.cli.emit('build.windows.copyResources', this, cb);
 	}.bind(this));
 
-	appc.async.series(this, tasks, function (err, results) {
+	appc.async.series(this, tasks, function (err) {
 
 		if (err) {
 			return next(err);
 		}
 
-		var templateDir = path.join(this.platformPath, 'templates', 'app', 'default', 'template', 'Resources', 'windows');
+		const templateDir = path.join(this.platformPath, 'templates', 'app', 'default', 'template', 'Resources', 'windows');
 
 		// if an app icon hasn't been copied, copy the default one
-		var destIcon = path.join(this.buildTargetAssetsDir, this.tiapp.icon);
+		const destIcon = path.join(this.buildTargetAssetsDir, this.tiapp.icon);
 		if (!fs.existsSync(destIcon)) {
 			copyFile.call(this, path.join(templateDir, 'appicon.png'), destIcon);
 		}
 
-		var thirdpartyLibraries = this.hyperloopConfig.windows.thirdparty && Object.keys(this.hyperloopConfig.windows.thirdparty) || [];
+		const thirdpartyLibraries = this.hyperloopConfig.windows.thirdparty && Object.keys(this.hyperloopConfig.windows.thirdparty) || [];
 		function hasWindowsAPI(node_value) {
-			for (var i = 0; i < thirdpartyLibraries.length; i++) {
+			for (let i = 0; i < thirdpartyLibraries.length; i++) {
 				if (node_value.indexOf(thirdpartyLibraries[i] + '.') === 0) {
 					return true;
 				}
@@ -523,7 +525,7 @@ function copyResources(next) {
 				t_.native_events = t_.native_events || {};
 
 				// Look for native requires here
-				var fromContent = fs.readFileSync(from, {encoding: 'utf8'}),
+				let fromContent = fs.readFileSync(from, { encoding: 'utf8' }),
 					ast;
 				try {
 					ast = babylon.parse(fromContent, { filename: from });
@@ -539,37 +541,37 @@ function copyResources(next) {
 				if (!t_.useHyperloopBuilder) {
 					traverse(ast, {
 						CallExpression: {
-							enter: function(path) {
+							enter: function (path) {
 
 								// if we're calling require with one string literal argument...
 								// FIXME What if it is a requires, but not a string? What if it is a dynamically built string?
-								if (types.isIdentifier(path.node.callee, { name: 'require' }) &&
-										path.node.arguments && path.node.arguments.length == 1 &&
-										types.isStringLiteral(path.node.arguments[0])) {
+								if (types.isIdentifier(path.node.callee, { name: 'require' })
+										&& path.node.arguments && path.node.arguments.length === 1
+										&& types.isStringLiteral(path.node.arguments[0])) {
 									// check if the required type is "native"
-									var node_value = path.node.arguments[0].value;
+									const node_value = path.node.arguments[0].value;
 									if (hasWindowsAPI(node_value)) {
-										t_.logger.info("Detected native API reference: " + node_value);
-										t_.native_types[node_value] = {name: node_value};
+										t_.logger.info('Detected native API reference: ' + node_value);
+										t_.native_types[node_value] = { name: node_value };
 									}
-								} else if (types.isMemberExpression(path.node.callee) && // are we calling 'addEventListener'?
-										types.isIdentifier(path.node.callee.property, { name: 'addEventListener' }) &&
-										path.node.arguments && path.node.arguments.length > 0 && // with at least one argument
-										types.isStringLiteral(path.node.arguments[0]) && // first argument is a string literal
-										types.isIdentifier(path.node.callee.object) // on some variable
-										) {
-									var event_name = path.node.arguments[0].value,  // record the event name
+								} else if (types.isMemberExpression(path.node.callee) // are we calling 'addEventListener'?
+										&& types.isIdentifier(path.node.callee.property, { name: 'addEventListener' })
+										&& path.node.arguments && path.node.arguments.length > 0 // with at least one argument
+										&& types.isStringLiteral(path.node.arguments[0]) // first argument is a string literal
+										&& types.isIdentifier(path.node.callee.object) // on some variable
+								) {
+									const event_name = path.node.arguments[0].value,  // record the event name
 										binding = path.scope.getBinding(path.node.callee.object.name); // get binding for the receiver variable
-									if (binding && // if we got the initial binding for the variable
-											types.isVariableDeclarator(binding.path.node) && // and it declares the variable
-											types.isNewExpression(binding.path.node.init) && // and it's assigned from a 'new' expression
-											types.isIdentifier(binding.path.node.init.callee) // and the type is an identifier
-											) {
-										var ctor = path.scope.getBinding(binding.path.node.init.callee.name); // and it's the constructor variable
+									if (binding // if we got the initial binding for the variable
+											&& types.isVariableDeclarator(binding.path.node) // and it declares the variable
+											&& types.isNewExpression(binding.path.node.init) // and it's assigned from a 'new' expression
+											&& types.isIdentifier(binding.path.node.init.callee) // and the type is an identifier
+									) {
+										const ctor = path.scope.getBinding(binding.path.node.init.callee.name); // and it's the constructor variable
 										if (ctor && ctor.path.node.init && ctor.path.node.init.arguments && ctor.path.node.init.arguments.length > 0) {
-											var detectedConstructorType = ctor.path.node.init.arguments[0].value; // record the type of the constructor
+											const detectedConstructorType = ctor.path.node.init.arguments[0].value; // record the type of the constructor
 											if (hasWindowsAPI(detectedConstructorType)) {
-												var native_event = {
+												const native_event = {
 													name: event_name,
 													type: detectedConstructorType,
 													signature: event_name + '_' + detectedConstructorType.replace(/\./g, '_')
@@ -603,12 +605,12 @@ function copyResources(next) {
 					this.cli.createHook('build.windows.analyzeJsFile', this, function (from, to, ast, traverse, types, cb) {
 						this.cli.createHook('build.windows.copyResource', this, function (from, to, cb) {
 							// parse the AST
-							var r = jsanalyze.analyzeJsFile(from, {minify: this.minifyJS});
+							var r = jsanalyze.analyzeJsFile(from, { minify: this.minifyJS });
 
 							// we want to sort by the "to" filename so that we correctly handle file overwriting
 							this.tiSymbols[to] = r.symbols;
 
-							var dir = path.dirname(to);
+							const dir = path.dirname(to);
 							fs.existsSync(dir) || wrench.mkdirSyncRecursive(dir);
 
 							if (this.minifyJS) {
@@ -651,9 +653,9 @@ function copyResources(next) {
 			this.encryptJS && jsFilesToEncrypt.push('_app_props_.json');
 
 			// write the app info file
-			var appInfoFile = path.join(this.buildTargetAssetsDir, '_app_info_.json'),
-				appInfo =
-				{
+			const appInfoFile = path.join(this.buildTargetAssetsDir, '_app_info_.json'),
+				appInfo
+				= {
 					deployType: this.deployType,
 					name: this.tiapp.name,
 					id: this.tiapp.id,

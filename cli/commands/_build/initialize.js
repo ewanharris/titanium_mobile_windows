@@ -1,9 +1,8 @@
-var appc = require('node-appc'),
+'use strict';
+
+const appc = require('node-appc'),
 	fs = require('fs'),
-	os = require('os'),
-	path = require('path'),
-	ti = require('node-titanium-sdk'),
-	__ = appc.i18n(__dirname).__;
+	path = require('path');
 
 /*
  Public API.
@@ -33,8 +32,8 @@ function initialize(next) {
 	// cmake
 	this.cmakeDir = path.resolve(__dirname, '..', '..', 'vendor', 'cmake');
 	this.cmake = path.join(this.cmakeDir, 'bin', 'cmake.exe');
-	if (this.target == 'wp-emulator' || this.target == 'wp-device' || this.target == 'dist-phonestore') {
-		if (this.target == 'wp-device' || this.target == 'dist-phonestore') {
+	if (this.target === 'wp-emulator' || this.target === 'wp-device' || this.target === 'dist-phonestore') {
+		if (this.target === 'wp-device' || this.target === 'dist-phonestore') {
 			this.cmakeArch = 'ARM';
 		} else {
 			this.cmakeArch = 'Win32';
@@ -46,22 +45,22 @@ function initialize(next) {
 		this.cmakePlatform = 'WindowsStore';
 		this.cmakePlatformAbbrev = 'store';
 	}
-	if (this.wpsdk == '10.0') {
+	if (this.wpsdk === '10.0') {
 		this.cmakePlatform = 'WindowsStore';
 		this.cmakePlatformAbbrev = 'win10';
 	}
-	this.arch = this.cmakeArch == 'Win32' ? 'x86' : this.cmakeArch;
+	this.arch = this.cmakeArch === 'Win32' ? 'x86' : this.cmakeArch;
 	this.cmakeTarget = this.cmakePlatformAbbrev + '.' + this.arch;
 
 	// Detect CMake generator name: e.g. 12.0 -> Visual Studio 12 2013
 	// because there's no specific way to auto-detect "year" component
-	var supportedCMakeGenerators = {
+	const supportedCMakeGenerators = {
 		'12.0': 'Visual Studio 12 2013',
 		'14.0': 'Visual Studio 14 2015',
 		'15.0': 'Visual Studio 15 2017',
 	};
 
-	var vstarget = argv['vs-target'];
+	let vstarget = argv['vs-target'];
 
 	// As of Visual Studio 2017, multiple editions can coexist.
 	if (/^Visual Studio \w+ 2017/.test(vstarget)) {
@@ -77,12 +76,12 @@ function initialize(next) {
 
 	// Publisher id may be a GUID, or they may have copied it verbatim from dev account with CN= prefix
 	this.publisherId = argv['win-publisher-id'];
-	if (this.publisherId.indexOf('CN=') != 0) {
+	if (this.publisherId.indexOf('CN=') !== 0) {
 		// We need to prepend CN= prefix for appxmanifest and cert generation
-		this.publisherId = "CN=" + this.publisherId;
+		this.publisherId = 'CN=' + this.publisherId;
 	}
-	this.phonePublisherId = argv['wp-publisher-guid'] ? argv['wp-publisher-guid'] : "00000000-0000-0000-0000-000000000000";
-	this.phoneProductId = argv['win-product-guid'] ? argv['win-product-guid'] : (argv['wp-product-guid'] ? argv['wp-product-guid'] : "f0473be1-c557-4f98-a103-4ba9f453b5b0");
+	this.phonePublisherId = argv['wp-publisher-guid'] ? argv['wp-publisher-guid'] : '00000000-0000-0000-0000-000000000000';
+	this.phoneProductId = argv['win-product-guid'] ? argv['win-product-guid'] : (argv['wp-product-guid'] ? argv['wp-product-guid'] : 'f0473be1-c557-4f98-a103-4ba9f453b5b0');
 
 	this.buildSrcDir = path.join(this.buildDir, 'src'); // Where the src files go
 	this.cmakeTargetDir = path.join(this.buildDir, this.cmakeTarget); // where cmake generates the VS solution
@@ -95,8 +94,8 @@ function initialize(next) {
 	this.cmakeFinderDir = path.join(this.buildDir, 'cmake');
 
 	// Hyperloop configuration
-	var hyperloopAppcJs = path.join(this.projectDir, 'appc.windows.js');
-	this.hyperloopConfig = fs.existsSync(hyperloopAppcJs) && require(hyperloopAppcJs).hyperloop || {};
+	const hyperloopAppcJs = path.join(this.projectDir, 'appc.windows.js');
+	this.hyperloopConfig = fs.existsSync(hyperloopAppcJs) && require(hyperloopAppcJs).hyperloop || {}; // eslint-disable-line security/detect-non-literal-require
 	this.hyperloopConfig.windows || (this.hyperloopConfig.windows = {});
 
 	next();

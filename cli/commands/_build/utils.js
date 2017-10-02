@@ -1,5 +1,6 @@
-var appc = require('node-appc');
+'use strict';
 
+const appc = require('node-appc');
 
 /*
  Public API.
@@ -20,12 +21,18 @@ function mixin(WindowsBuilder) {
 /**
  * Returns Windows SDK argument
  */
+
+/**
+ * Returns the Windows SDK argument
+ * @return {String} Windows SDK specified by the user, or selected by the CLI
+ */
 function getWindowsSDKTarget() {
 	return this.cli.argv['win-sdk'] ? this.cli.argv['win-sdk'] : (this.cli.argv['wp-sdk'] ? this.cli.argv['wp-sdk'] : null);
 }
 
 /**
- * Returns whether Windows SDK is specified
+ * Returns whether the user has specified a Windows SDK to build with
+ * @return {Boolean}
  */
 function isWindowsSDKTargetSpecified() {
 	return this.cli.argv.$_.indexOf('--wp-sdk') !== -1 || this.cli.argv.$_.indexOf('--win-sdk') !== -1 || this.cli.argv.$_.indexOf('-S') !== -1;
@@ -45,7 +52,7 @@ function getTargetDevices() {
 		return this.deviceCache;
 	}
 
-	var target = this.cli.argv.target,
+	const target = this.cli.argv.target,
 		wpsdk  = this.getWindowsSDKTarget(),
 		wpsdkDefault = !this.isWindowsSDKTargetSpecified();
 
@@ -61,11 +68,11 @@ function getTargetDevices() {
 		}, this);
 		return this.deviceCache;
 	} else if (target === 'wp-device' && Array.isArray(this.windowsInfo.devices)) {
-		var devices = this.windowsInfo.devices;
-		for (var d in devices) {
-			var device = devices[d];
+		const devices = this.windowsInfo.devices;
+		for (let d in devices) {
+			const device = devices[d];
 			// only list local devices
-			if (device.ip && device.ip !== "127.0.0.1") {
+			if (device.ip && device.ip !== '127.0.0.1') {
 				devices.splice(d, 1);
 			}
 		}
@@ -77,7 +84,7 @@ function getTargetDevices() {
 
 /**
  * Removes characters from the project name that aren't supported.
- * @param str
+ * @param 	{String} str 	The project name to sanitize
  * @returns {string}
  */
 function sanitizeProjectName(str) {
@@ -88,7 +95,6 @@ function sanitizeProjectName(str) {
 		.map(function (s) { return appc.string.capitalize(s); })
 		.join('');
 }
-
 
 /**
  * Generate hashes of modules and properties from the tiapp.xml so we can detect

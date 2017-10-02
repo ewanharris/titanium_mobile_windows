@@ -1,10 +1,9 @@
-var appc = require('node-appc'),
+'use strict';
+
+const appc = require('node-appc'),
 	fs = require('fs'),
-	os = require('os'),
 	path = require('path'),
-	spawn = require('child_process').spawn,
-	ti = require('node-titanium-sdk'),
-	windowslib = require('windowslib'),
+	spawn = require('child_process').spawn, // eslint-disable-line security/detect-child-process
 	__ = appc.i18n(__dirname).__;
 
 /*
@@ -35,31 +34,31 @@ function compileApp(next) {
 	this.logger.info(__('Running MSBuild on solution: %s', slnFile.cyan));
 
 	// Modify the vcxproj to inject some properties, so we always bundle
-	var modified = fs.readFileSync(vcxproj, 'utf8');
+	let modified = fs.readFileSync(vcxproj, 'utf8');
 	fs.existsSync(vcxproj) && fs.renameSync(vcxproj, vcxproj + '.bak');
 	// Only modify the one property group we care about!
 	modified = modified.replace(/<\/PropertyGroup>\s*<ItemDefinitionGroup/m,
-		'<AppxBundle>Always</AppxBundle>' +
-		'<AppxBundlePlatforms>' + this.arch + '</AppxBundlePlatforms>' +
-		(
-			!/^ws-local|dist-winstore$/.test(this.target) && this.wpsdk != '10.0' ? '' :
-			'<PackageCertificateThumbprint>' + this.certificateThumbprint + '</PackageCertificateThumbprint>' +
-			'<PackageCertificateKeyFile>' + this.certificatePath + '</PackageCertificateKeyFile>'
+		'<AppxBundle>Always</AppxBundle>'
+		+ '<AppxBundlePlatforms>' + this.arch + '</AppxBundlePlatforms>'
+		+ (
+			!/^ws-local|dist-winstore$/.test(this.target) && this.wpsdk !== '10.0' ? ''
+				: '<PackageCertificateThumbprint>' + this.certificateThumbprint + '</PackageCertificateThumbprint>'
+			+ '<PackageCertificateKeyFile>' + this.certificatePath + '</PackageCertificateKeyFile>'
 		) + '$&');
 
 	// Fix quoted hint paths for native module winmd paths
-	modified = modified.replace(/<HintPath>"([^"]+?)"<\/HintPath>/, '<HintPath>$1<\/HintPath>');
+	modified = modified.replace(/<HintPath>"([^"]+?)"<\/HintPath>/, '<HintPath>$1</HintPath>');
 	fs.writeFileSync(vcxproj, modified);
 
 	// Modify the Native vcxproj to fix quoted hint paths for module winmd paths
 	modified = fs.readFileSync(nativeVcxProj, 'utf8');
 	fs.existsSync(nativeVcxProj) && fs.renameSync(nativeVcxProj, nativeVcxProj + '.bak');
-	modified = modified.replace(/<HintPath>"([^"]+?)"<\/HintPath>/, '<HintPath>$1<\/HintPath>');
+	modified = modified.replace(/<HintPath>"([^"]+?)"<\/HintPath>/, '<HintPath>$1</HintPath>');
 	fs.writeFileSync(nativeVcxProj, modified);
 
 	// Use spawn directly so we can pipe output as we go
 	// FIXME Edit windowslib to allow realtime output
-	var vsInfo = this.windowsInfo.selectedVisualStudio,
+	let vsInfo = this.windowsInfo.selectedVisualStudio,
 		p;
 
 	if (!vsInfo) {
@@ -69,22 +68,19 @@ function compileApp(next) {
 	}
 
 	// Use spawn directly so we can pipe output as we go
-	p = spawn((process.env.comspec || 'cmd.exe'), ['/S', '/C', '"', vsInfo.vsDevCmd.replace(/[ \(\)\&]/g, '^$&') +
-		' &&' + ' MSBuild' + ' /p:Platform=' + _t.cmakeArch + ' /p:Configuration=' + _t.buildConfiguration + ' ' + slnFile, '"'
-	], {windowsVerbatimArguments: true});
-	
+	p = spawn((process.env.comspec || 'cmd.exe'), [ '/S', '/C', '"', vsInfo.vsDevCmd.replace(/[ ()&]/g, '^$&')
+		+ ' && MSBuild /p:Platform=' + _t.cmakeArch + ' /p:Configuration=' + _t.buildConfiguration + ' ' + slnFile, '"'
+	], { windowsVerbatimArguments: true });
+
 	p.stdout.on('data', function (data) {
 		var line = data.toString().trim();
 		if (line.indexOf('error ') >= 0) {
 			_t.logger.error(line);
-		}
-		else if (line.indexOf('warning ') >= 0) {
+		} else if (line.indexOf('warning ') >= 0) {
 			_t.logger.warn(line);
-		}
-		else if (line.indexOf(':\\') === -1) {
+		} else if (line.indexOf(':\\') === -1) {
 			_t.logger.debug(line);
-		}
-		else {
+		} else {
 			_t.logger.trace(line);
 		}
 	});
@@ -93,7 +89,7 @@ function compileApp(next) {
 	});
 	p.on('close', function (code) {
 
-		if (code != 0) {
+		if (code !== 0) {
 			process.exit(1); // Exit with code from msbuild?
 		}
 

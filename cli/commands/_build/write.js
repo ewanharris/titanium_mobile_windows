@@ -1,7 +1,7 @@
-var appc = require('node-appc'),
+'use strict';
+
+const appc = require('node-appc'),
 	fs = require('fs'),
-	os = require('os'),
-	path = require('path'),
 	ti = require('node-titanium-sdk'),
 	wrench = require('wrench'),
 	__ = appc.i18n(__dirname).__;
@@ -25,7 +25,6 @@ function mixin(WindowsBuilder) {
  */
 function writeBuildManifest(next) {
 	this.logger.info(__('Writing build manifest: %s', this.buildManifestFile.cyan));
-
 
 	this.cli.createHook('build.windows.writeBuildManifest', this, function (manifest, cb) {
 		fs.existsSync(this.buildDir) || wrench.mkdirSyncRecursive(this.buildDir);
@@ -55,4 +54,4 @@ function writeBuildManifest(next) {
 		encryptJS: this.encryptJS,
 		propertiesHash: this.propertiesHash
 	}, next);
-};
+}

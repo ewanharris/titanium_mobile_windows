@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Detects Windows development environment and displays it in the "titanium info" command.
  *
@@ -11,7 +13,7 @@
  * Please see the LICENSE included with this distribution for details.
  */
 
-var appc = require('node-appc'),
+const appc = require('node-appc'),
 	fs = require('fs'),
 	windowslib = require('windowslib'),
 	path = require('path'),
@@ -48,7 +50,7 @@ exports.detect = function (types, config, next) {
 				return dir;
 			}
 			dir = path.dirname(dir);
-			return dir != '/' && scan(dir);
+			return dir !== '/' && scan(dir);
 		}(__dirname)));
 
 		if (results.issues.length) {
@@ -75,21 +77,23 @@ exports.detect = function (types, config, next) {
 
 exports.render = function (logger, config, rpad, styleHeading, styleValue, styleBad) {
 	var data = this.data;
-	if (!data) return;
+	if (!data) {
+		return;
+	}
 
 	if (process.platform === 'win32') {
-						
+
 		// Visual Studio
 		logger.log(styleHeading(__('Microsoft (R) Visual Studio')));
 		if (data.visualstudio && Object.keys(data.visualstudio).length) {
 			Object.keys(data.visualstudio).sort().forEach(function (ver) {
 				var supported = data.visualstudio[ver].supported ? '' : styleBad(' **' + __('Not supported by Titanium SDK %s', data.tisdk) + '**');
 				logger.log(
-					'  ' + String(ver).cyan + (data.visualstudio[ver].selected ? ' (' + __('selected') + ')' : '').grey + supported + '\n' +
-					'  ' + rpad('  ' + __('Path')) + ' = ' + styleValue(data.visualstudio[ver].path) + '\n' +
-					'  ' + rpad('  ' + __('CLR Version')) + ' = ' + styleValue(data.visualstudio[ver].clrVersion) + '\n' +
-					'  ' + rpad('  ' + __('MSBuild Version')) + ' = ' + styleValue('v' + data.visualstudio[ver].msbuildVersion) + '\n' +
-					'  ' + rpad('  ' + __('Windows Phone SDKs')) + ' = ' + styleValue(data.visualstudio[ver].wpsdk ? Object.keys(data.visualstudio[ver].wpsdk).join(', ') : __('not installed'))
+					'  ' + String(ver).cyan + (data.visualstudio[ver].selected ? ' (' + __('selected') + ')' : '').grey + supported + '\n'
+					+ '  ' + rpad('  ' + __('Path')) + ' = ' + styleValue(data.visualstudio[ver].path) + '\n'
+					+ '  ' + rpad('  ' + __('CLR Version')) + ' = ' + styleValue(data.visualstudio[ver].clrVersion) + '\n'
+					+ '  ' + rpad('  ' + __('MSBuild Version')) + ' = ' + styleValue('v' + data.visualstudio[ver].msbuildVersion) + '\n'
+					+ '  ' + rpad('  ' + __('Windows Phone SDKs')) + ' = ' + styleValue(data.visualstudio[ver].wpsdk ? Object.keys(data.visualstudio[ver].wpsdk).join(', ') : __('not installed'))
 				);
 			});
 			logger.log();
@@ -102,8 +106,8 @@ exports.render = function (logger, config, rpad, styleHeading, styleValue, style
 			Object.keys(data.windowsphone).sort().forEach(function (ver) {
 				var supported = data.windowsphone[ver].supported ? '' : styleBad(' **' + __('Not supported by Titanium SDK %s', data.tisdk) + '**');
 				logger.log(
-					'  ' + String(ver).cyan + (data.windowsphone[ver].selected ? ' (' + __('selected') + ')' : '').grey + supported + '\n' +
-					'  ' + rpad('  ' + __('Path')) + ' = ' + styleValue(data.windowsphone[ver].path)
+					'  ' + String(ver).cyan + (data.windowsphone[ver].selected ? ' (' + __('selected') + ')' : '').grey + supported + '\n'
+					+ '  ' + rpad('  ' + __('Path')) + ' = ' + styleValue(data.windowsphone[ver].path)
 				);
 			});
 			logger.log();

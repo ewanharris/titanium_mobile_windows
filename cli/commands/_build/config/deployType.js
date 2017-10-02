@@ -1,4 +1,6 @@
-var appc = require('node-appc'),
+'use strict';
+
+const appc = require('node-appc'),
 	__ = appc.i18n(__dirname).__;
 
 /**
@@ -14,6 +16,6 @@ module.exports = function configOptionDeployType(order) {
 		desc: __('the type of deployment; only applicable when target is %s, %s, or %s', 'wp-emulator'.cyan, 'wp-device'.cyan, 'ws-local'.cyan), // or ws-simulator or ws-remote
 		hint: __('type'),
 		order: order,
-		values: ['test', 'development', 'production']
+		values: [ 'test', 'development', 'production' ]
 	};
 };

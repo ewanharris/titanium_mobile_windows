@@ -1,5 +1,6 @@
-var appc = require('node-appc'),
-	windowslib = require('windowslib'),
+'use strict';
+
+const appc = require('node-appc'),
 	__ = appc.i18n(__dirname).__;
 
 /**
@@ -14,7 +15,7 @@ module.exports = function configOptionVisualStudioTarget(order) {
 
 	var vsTargets = [];
 	if (this.windowsInfo) {
-		for (var version in this.windowsInfo.visualstudio) {
+		for (let version in this.windowsInfo.visualstudio) {
 			vsTargets.push(version);
 		}
 	}

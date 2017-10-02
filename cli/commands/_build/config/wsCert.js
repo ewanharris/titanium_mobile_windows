@@ -1,8 +1,9 @@
-var appc = require('node-appc'),
+'use strict';
+
+const appc = require('node-appc'),
+	execSync = require('child_process').execSync, // eslint-disable-line security/detect-child-process
 	fields = require('fields'),
-	path = require('path'),
 	fs = require('fs'),
-	windowslib = require('windowslib'),
 	__ = appc.i18n(__dirname).__;
 
 /**
@@ -13,7 +14,7 @@ var appc = require('node-appc'),
  * @returns {Object}
  */
 module.exports = function configOptionCert(order) {
-	var defaultCert = undefined,
+	let defaultCert,
 		certs = fs.readdirSync('./').filter(function (file) {
 			return file.slice(-4).toLowerCase() === '.pfx';
 		});
@@ -47,8 +48,7 @@ module.exports = function configOptionCert(order) {
 			});
 			if (certs.length === 1) {
 				console.log('(Hint: Found a pfx file in working directory: ' + certs[0] + ')');
-			}
-			else if (certs.length > 1) {
+			} else if (certs.length > 1) {
 				console.log('(Hint: Found these pfx files in working directory: ' + certs.join(', ') + ')');
 			}
 			callback(fields.file({
@@ -68,8 +68,8 @@ module.exports = function configOptionCert(order) {
 			if (!value || value === '') {
 				// If dist-winstore or (dist-phonestore && 10.0), require
 				// password because they'll be generating a PFX!
-				if (this.cli.argv['target']  == 'dist-winstore' ||
-					(this.getWindowsSDKTarget() == '10.0' && this.cli.argv['target'] == 'dist-phonestore')) {
+				if (this.cli.argv['target']  === 'dist-winstore'
+					|| (this.getWindowsSDKTarget() === '10.0' && this.cli.argv['target'] === 'dist-phonestore')) {
 					this.conf.options['pfx-password'].required = true;
 				}
 				// otherwise we'll use the built-in temp key w/no password
@@ -91,8 +91,7 @@ module.exports = function configOptionCert(order) {
 				stdout = execSync('certutil -p "" -dump "' + certFile + '"');
 				if (stdout.indexOf('The system cannot find the file specified.') >= 0) {
 					return; // keep password required. Thsi shouldn't ever happen!
-				}
-				else {
+				} else {
 					// We got the cert details, password isn't required!
 					stdout.split('Cert Hash(sha1): ')[1].split('\r')[0].split(' ').join('').toUpperCase();
 					this.conf.options['pfx-password'].required = false;
