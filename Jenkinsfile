@@ -7,6 +7,7 @@ def gitCommit = ''
 // FIXME Using the nodejs jenkins plugin introduces complications that cause us not to properly connect to the Windows Phone emulator for logs
 // Likely need to modify the firewall rules to allow traffic from the new nodejs install like we do for system install!
 def nodeVersion = '8.11.1' // NOTE that changing this requires we set up the desired version on jenkins master first!
+def npmVersion = '5.8.0'
 
 def build(sdkVersion, msBuildVersion, architecture, gitCommit, nodeVersion) {
 	unstash 'sources' // for build
@@ -16,7 +17,7 @@ def build(sdkVersion, msBuildVersion, architecture, gitCommit, nodeVersion) {
 	bat 'mkdir dist\\windows'
 
 	// nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
-	// 	bat 'npm install -g npm@5.4.1' // Install NPM 5.4.1
+	bat "npm install -g npm@${npmVersion}"
 	// 	def nodeHome = tool(name: "node ${nodeVersion}", type: 'nodejs')
 	// 	echo nodeHome
 	// 	bat "netsh advfirewall firewall add rule name=\"Node ${nodeVersion}\ TCP" program=\"${nodeHome}\\node.exe\" dir=in action=allow protocol=TCP"
@@ -50,7 +51,7 @@ def unitTests(target, branch, testSuiteBranch, nodeVersion) {
 	unarchive mapping: ['dist/' : '.'] // copy in built SDK from dist/ folder (from Build stage)
 	unstash 'sources'
 	// nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
-		// bat 'npm install -g npm@5.4.1' // Install NPM 5.4.1
+		bat "npm install -g npm@${npmVersion}"
 		dir('Tools/Scripts/build') {
 			echo 'Setting up SDK'
 			bat 'npm install .'
@@ -141,9 +142,9 @@ timestamps {
 						sh 'npm install .'
 						sh 'node ti_win_yaml.js'
 					} else {
-						bat 'call npm install -g npm@5.7.1'
-						bat 'call npm install .'
-						bat 'call node ti_win_yaml.js'
+						bat "npm install -g npm@${npmVersion}"
+						bat 'npm install .'
+						bat 'node ti_win_yaml.js'
 					}
 				}
 			}
