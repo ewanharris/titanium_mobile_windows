@@ -20,7 +20,7 @@ var path = require('path'),
  * @param next {Function} callback function
  **/
 function installSDK(branch, next) {
-	var prc = spawn('node', [titanium, 'sdk', 'install', '-b', branch, '-d', '--no-colors']),
+	var prc = spawn('node', [titanium, 'sdk', 'install', '-b', branch, '-d', '--force', '--no-colors']),
 		sdkVersion;
 	prc.stdout.on('data', function (data) {
 		var value = data.toString().trim(),
@@ -152,27 +152,27 @@ function setupSDK(branch, location) {
 				tiSDKVersion = version;
 				next();
 			});
-		},
-		function (next) {
-			getSDKInstallDir(tiSDKVersion, function (err, installPath) {
-				if (err) {
-					return next(err);
-				}
-				sdkPath = installPath;
-				next();
-			});
-		},
-		function (next) {
-			console.log("Copying built Windows SDK from " + location + " into master SDK at " + sdkPath);
-			copyWindowsIntoSDK(sdkPath, location, next);
-		},
-		function (next) {
-			if (hadWindowsSDK) {
-				next();
-			} else {
-				addWindowsToSDKManifest(sdkPath, next);
-			}
 		}
+		// function (next) {
+		// 	getSDKInstallDir(tiSDKVersion, function (err, installPath) {
+		// 		if (err) {
+		// 			return next(err);
+		// 		}
+		// 		sdkPath = installPath;
+		// 		next();
+		// 	});
+		// },
+		// function (next) {
+		// 	console.log("Copying built Windows SDK from " + location + " into master SDK at " + sdkPath);
+		// 	// copyWindowsIntoSDK(sdkPath, location, next);
+		// },
+		// function (next) {
+		// 	if (hadWindowsSDK) {
+		// 		next();
+		// 	} else {
+		// 		addWindowsToSDKManifest(sdkPath, next);
+		// 	}
+		// }
 	]);
 }
 
