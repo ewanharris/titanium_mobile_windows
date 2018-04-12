@@ -49,7 +49,7 @@ def npmVersion = '5.8.0'
 def unitTests(target, branch, testSuiteBranch, nodeVersion) {
 	def defaultEmulatorID = '10-0-1'
 	// unarchive mapping: ['dist/' : '.'] // copy in built SDK from dist/ folder (from Build stage)
-	// unstash 'sources'
+	unstash 'sources'
 	nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
 		// bat "npm install -g npm@${npmVersion}"
 		dir('Tools/Scripts/build') {
