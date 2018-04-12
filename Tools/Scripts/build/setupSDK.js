@@ -20,7 +20,7 @@ var path = require('path'),
  * @param next {Function} callback function
  **/
 function installSDK(branch, next) {
-	var prc = spawn('node', [titanium, 'sdk', 'install', '-b', branch, '-d', '--force', '--no-colors']),
+	var prc = spawn('node', [titanium, 'sdk', 'install', '-b', branch, '-d', '--no-colors']),
 		sdkVersion;
 	prc.stdout.on('data', function (data) {
 		var value = data.toString().trim(),

@@ -18,10 +18,6 @@ def npmVersion = '5.8.0'
 
 // 	nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
 // 		bat "npm install -g npm@${npmVersion}"
-// 		def nodeHome = tool(name: "node ${nodeVersion}", type: 'nodejs')
-// 		echo nodeHome
-// 		bat "netsh advfirewall firewall add rule name=\"Node ${nodeVersion}\ TCP" program=\"${nodeHome}\\node.exe\" dir=in action=allow protocol=TCP"
-// 		bat "netsh advfirewall firewall add rule name=\"Node ${nodeVersion}\ UDP" program=\"${nodeHome}\\node.exe\" dir=in action=allow protocol=UDP"
 // 		dir('Tools/Scripts') {
 // 			bat 'npm install .'
 // 			echo "Installing JSC built for Windows ${sdkVersion}"
@@ -52,6 +48,10 @@ def unitTests(target, branch, testSuiteBranch, nodeVersion) {
 	unstash 'sources'
 	nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
 		// bat "npm install -g npm@${npmVersion}"
+		def nodeHome = tool(name: "node ${nodeVersion}", type: 'nodejs')
+		echo nodeHome
+		bat "netsh advfirewall firewall add rule name=\"Node ${nodeVersion}\ TCP" program=\"${nodeHome}\\node.exe\" dir=in action=allow protocol=TCP"
+		bat "netsh advfirewall firewall add rule name=\"Node ${nodeVersion}\ UDP" program=\"${nodeHome}\\node.exe\" dir=in action=allow protocol=UDP"
 		dir('Tools/Scripts/build') {
 			echo 'Setting up SDK'
 			bat 'npm install .'
