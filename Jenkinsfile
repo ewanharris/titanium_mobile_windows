@@ -50,7 +50,7 @@ def unitTests(target, branch, testSuiteBranch, nodeVersion) {
 	def defaultEmulatorID = '10-0-1'
 	// unarchive mapping: ['dist/' : '.'] // copy in built SDK from dist/ folder (from Build stage)
 	// unstash 'sources'
-	// nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
+	nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
 		// bat "npm install -g npm@${npmVersion}"
 		dir('Tools/Scripts/build') {
 			echo 'Setting up SDK'
@@ -76,7 +76,7 @@ def unitTests(target, branch, testSuiteBranch, nodeVersion) {
 					if ('ws-local'.equals(target)) {
 						bat "node test.js -p windows -T ${target} --skip-sdk-install --cleanup"
 					} else if ('wp-emulator'.equals(target)) {
-						bat "node test.js -p windows -T ${target} -C ${defaultEmulatorID} --cleanup"
+						bat "node test.js -p windows -T ${target} -C ${defaultEmulatorID}"
 					}
 				}
 			} catch (e) {
@@ -101,7 +101,7 @@ def unitTests(target, branch, testSuiteBranch, nodeVersion) {
 			}
 			junit 'junit.*.xml'
 		} // dir 'titanium-mobile-mocha-suite/scripts
-	// } // nodejs
+	} // nodejs
 } // def unitTests
 
 // wrap in timestamps
