@@ -9,49 +9,49 @@ def gitCommit = ''
 def nodeVersion = '8.11.1' // NOTE that changing this requires we set up the desired version on jenkins master first!
 def npmVersion = '5.8.0'
 
-def build(sdkVersion, msBuildVersion, architecture, gitCommit, nodeVersion) {
-	unstash 'sources' // for build
-	if (fileExists('dist/windows')) {
-		bat 'rmdir dist\\windows /Q /S'
-	}
-	bat 'mkdir dist\\windows'
+// def build(sdkVersion, msBuildVersion, architecture, gitCommit, nodeVersion) {
+// 	unstash 'sources' // for build
+// 	if (fileExists('dist/windows')) {
+// 		bat 'rmdir dist\\windows /Q /S'
+// 	}
+// 	bat 'mkdir dist\\windows'
 
-	nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
-		bat "npm install -g npm@${npmVersion}"
-		def nodeHome = tool(name: "node ${nodeVersion}", type: 'nodejs')
-		echo nodeHome
-		bat "netsh advfirewall firewall add rule name=\"Node ${nodeVersion}\ TCP" program=\"${nodeHome}\\node.exe\" dir=in action=allow protocol=TCP"
-		bat "netsh advfirewall firewall add rule name=\"Node ${nodeVersion}\ UDP" program=\"${nodeHome}\\node.exe\" dir=in action=allow protocol=UDP"
-		dir('Tools/Scripts') {
-			bat 'npm install .'
-			echo "Installing JSC built for Windows ${sdkVersion}"
-			bat "node setup.js -s ${sdkVersion} --no-color --no-progress-bars"
-			bat 'rmdir node_modules /Q /S'
-		}
+// 	nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
+// 		bat "npm install -g npm@${npmVersion}"
+// 		def nodeHome = tool(name: "node ${nodeVersion}", type: 'nodejs')
+// 		echo nodeHome
+// 		bat "netsh advfirewall firewall add rule name=\"Node ${nodeVersion}\ TCP" program=\"${nodeHome}\\node.exe\" dir=in action=allow protocol=TCP"
+// 		bat "netsh advfirewall firewall add rule name=\"Node ${nodeVersion}\ UDP" program=\"${nodeHome}\\node.exe\" dir=in action=allow protocol=UDP"
+// 		dir('Tools/Scripts') {
+// 			bat 'npm install .'
+// 			echo "Installing JSC built for Windows ${sdkVersion}"
+// 			bat "node setup.js -s ${sdkVersion} --no-color --no-progress-bars"
+// 			bat 'rmdir node_modules /Q /S'
+// 		}
 
-		dir('Tools/Scripts/build') {
-			bat 'npm install .'
+// 		dir('Tools/Scripts/build') {
+// 			bat 'npm install .'
 
-			timeout(45) {
-				echo "Building for ${architecture} ${sdkVersion}"
-				def raw = bat(returnStdout: true, script: "echo %JavaScriptCore_${sdkVersion}_HOME%").trim()
-				def jscHome = raw.split('\n')[-1]
-				echo "Setting JavaScriptCore_HOME to ${jscHome}"
-				withEnv(["JavaScriptCore_HOME=${jscHome}"]) {
-					bat "node build.js -s ${sdkVersion} -m ${msBuildVersion} -o ${architecture} --sha ${gitCommit}"
-				}
-			} // timeout
-		} // dir Tool/Scripts/build
-	} // nodejs
-	archiveArtifacts artifacts: 'dist/**/*'
-} // def build
+// 			timeout(45) {
+// 				echo "Building for ${architecture} ${sdkVersion}"
+// 				def raw = bat(returnStdout: true, script: "echo %JavaScriptCore_${sdkVersion}_HOME%").trim()
+// 				def jscHome = raw.split('\n')[-1]
+// 				echo "Setting JavaScriptCore_HOME to ${jscHome}"
+// 				withEnv(["JavaScriptCore_HOME=${jscHome}"]) {
+// 					bat "node build.js -s ${sdkVersion} -m ${msBuildVersion} -o ${architecture} --sha ${gitCommit}"
+// 				}
+// 			} // timeout
+// 		} // dir Tool/Scripts/build
+// 	} // nodejs
+// 	archiveArtifacts artifacts: 'dist/**/*'
+// } // def build
 
 def unitTests(target, branch, testSuiteBranch, nodeVersion) {
 	def defaultEmulatorID = '10-0-1'
 	// unarchive mapping: ['dist/' : '.'] // copy in built SDK from dist/ folder (from Build stage)
 	// unstash 'sources'
-	nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
-		bat "npm install -g npm@${npmVersion}"
+	// nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
+		// bat "npm install -g npm@${npmVersion}"
 		dir('Tools/Scripts/build') {
 			echo 'Setting up SDK'
 			bat 'npm install .'
@@ -101,7 +101,7 @@ def unitTests(target, branch, testSuiteBranch, nodeVersion) {
 			}
 			junit 'junit.*.xml'
 		} // dir 'titanium-mobile-mocha-suite/scripts
-	} // nodejs
+	// } // nodejs
 } // def unitTests
 
 // wrap in timestamps
