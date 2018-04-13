@@ -48,12 +48,15 @@ def unitTests(target, branch, testSuiteBranch, nodeVersion) {
 	unstash 'sources'
 	nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
 		// bat "npm install -g npm@${npmVersion}"
-		def nodeHome = tool(name: "node ${nodeVersion}", type: 'nodejs')
-		echo nodeHome
-		bat "netsh advfirewall firewall add rule name=\"Node ${nodeVersion} All\" program=\"${nodeHome}\\node.exe\" dir=in action=allow"
+		// def nodeHome = tool(name: "node ${nodeVersion}", type: 'nodejs')
+		// echo nodeHome
+		// bat "netsh advfirewall firewall add rule name=\"Node ${nodeVersion} All\" program=\"${nodeHome}\\node.exe\" dir=in action=allow"
 		// bat "netsh advfirewall firewall add rule name=\"Node ${nodeVersion} UDP\" program=\"${nodeHome}\\node.exe\" dir=in action=allow"
 		// bat "netsh advfirewall firewall show rule name=\"Node ${nodeVersion} UDP\""
-		bat "netsh advfirewall firewall show rule name=\"Node ${nodeVersion} All\""
+		// bat "netsh advfirewall firewall show rule name=\"Node ${nodeVersion} All\""
+		dir('scripts') {
+			powershell 'setup-firewall.ps1'
+		}
 		dir('Tools/Scripts/build') {
 			echo 'Setting up SDK'
 			bat 'npm install .'
