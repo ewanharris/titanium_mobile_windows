@@ -6,7 +6,7 @@ def gitCommit = ''
 // Variables we can change
 // FIXME Using the nodejs jenkins plugin introduces complications that cause us not to properly connect to the Windows Phone emulator for logs
 // Likely need to modify the firewall rules to allow traffic from the new nodejs install like we do for system install!
-def nodeVersion = '8.9.1' // NOTE that changing this requires we set up the desired version on jenkins master first!
+def nodeVersion = '8.11.1' // NOTE that changing this requires we set up the desired version on jenkins master first!
 def npmVersion = '5.8.0'
 
 // def build(sdkVersion, msBuildVersion, architecture, gitCommit, nodeVersion) {
@@ -48,15 +48,11 @@ def unitTests(target, branch, testSuiteBranch, nodeVersion) {
 	unstash 'sources'
 	nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
 		// bat "npm install -g npm@${npmVersion}"
-		// def nodeHome = tool(name: "node ${nodeVersion}", type: 'nodejs')
-		// echo nodeHome
-		// bat "netsh advfirewall firewall add rule name=\"Node ${nodeVersion} All\" program=\"${nodeHome}\\node.exe\" dir=in action=allow"
-		// bat "netsh advfirewall firewall add rule name=\"Node ${nodeVersion} UDP\" program=\"${nodeHome}\\node.exe\" dir=in action=allow"
-		// bat "netsh advfirewall firewall show rule name=\"Node ${nodeVersion} UDP\""
-		// bat "netsh advfirewall firewall show rule name=\"Node ${nodeVersion} All\""
-		dir('scripts') {
-			powershell "./setup-firewall.ps1 ${nodeVersion}"
-		}
+		def nodeHome = tool(name: "node ${nodeVersion}", type: 'nodejs')
+		echo nodeHome
+		bat "netsh advfirewall firewall add rule name=\"Node ${nodeVersion}\" program=\"${nodeHome}\\node.exe\" dir=in action=allow protocol=udp description=\"Firewall rule\""
+		bat "netsh advfirewall firewall add rule name=\"Node ${nodeVersion}\" program=\"${nodeHome}\\node.exe\" dir=in action=allow protocol=tcp description=\"Firewall rule\""
+
 		dir('Tools/Scripts/build') {
 			echo 'Setting up SDK'
 			bat 'npm install .'
