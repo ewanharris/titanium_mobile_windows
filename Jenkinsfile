@@ -55,7 +55,7 @@ def unitTests(target, branch, testSuiteBranch, nodeVersion) {
 		// bat "netsh advfirewall firewall show rule name=\"Node ${nodeVersion} UDP\""
 		// bat "netsh advfirewall firewall show rule name=\"Node ${nodeVersion} All\""
 		dir('scripts') {
-			powershell 'setup-firewall.ps1'
+			powershell './setup-firewall.ps1'
 		}
 		dir('Tools/Scripts/build') {
 			echo 'Setting up SDK'
