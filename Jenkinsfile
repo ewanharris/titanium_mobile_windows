@@ -9,45 +9,45 @@ def gitCommit = ''
 def nodeVersion = '8.11.1' // NOTE that changing this requires we set up the desired version on jenkins master first!
 def npmVersion = '5.8.0'
 
-// def build(sdkVersion, msBuildVersion, architecture, gitCommit, nodeVersion) {
-// 	unstash 'sources' // for build
-// 	if (fileExists('dist/windows')) {
-// 		bat 'rmdir dist\\windows /Q /S'
-// 	}
-// 	bat 'mkdir dist\\windows'
+def build(sdkVersion, msBuildVersion, architecture, gitCommit, nodeVersion, npmVersion) {
+	unstash 'sources' // for build
+	if (fileExists('dist/windows')) {
+		bat 'rmdir dist\\windows /Q /S'
+	}
+	bat 'mkdir dist\\windows'
 
-// 	nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
-// 		bat "npm install -g npm@${npmVersion}"
-// 		dir('Tools/Scripts') {
-// 			bat 'npm install .'
-// 			echo "Installing JSC built for Windows ${sdkVersion}"
-// 			bat "node setup.js -s ${sdkVersion} --no-color --no-progress-bars"
-// 			bat 'rmdir node_modules /Q /S'
-// 		}
+	nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
+		bat "npm install -g npm@${npmVersion}"
+		dir('Tools/Scripts') {
+			bat 'npm install .'
+			echo "Installing JSC built for Windows ${sdkVersion}"
+			bat "node setup.js -s ${sdkVersion} --no-color --no-progress-bars"
+			bat 'rmdir node_modules /Q /S'
+		}
 
-// 		dir('Tools/Scripts/build') {
-// 			bat 'npm install .'
+		dir('Tools/Scripts/build') {
+			bat 'npm install .'
 
-// 			timeout(45) {
-// 				echo "Building for ${architecture} ${sdkVersion}"
-// 				def raw = bat(returnStdout: true, script: "echo %JavaScriptCore_${sdkVersion}_HOME%").trim()
-// 				def jscHome = raw.split('\n')[-1]
-// 				echo "Setting JavaScriptCore_HOME to ${jscHome}"
-// 				withEnv(["JavaScriptCore_HOME=${jscHome}"]) {
-// 					bat "node build.js -s ${sdkVersion} -m ${msBuildVersion} -o ${architecture} --sha ${gitCommit}"
-// 				}
-// 			} // timeout
-// 		} // dir Tool/Scripts/build
-// 	} // nodejs
-// 	archiveArtifacts artifacts: 'dist/**/*'
-// } // def build
+			timeout(45) {
+				echo "Building for ${architecture} ${sdkVersion}"
+				def raw = bat(returnStdout: true, script: "echo %JavaScriptCore_${sdkVersion}_HOME%").trim()
+				def jscHome = raw.split('\n')[-1]
+				echo "Setting JavaScriptCore_HOME to ${jscHome}"
+				withEnv(["JavaScriptCore_HOME=${jscHome}"]) {
+					bat "node build.js -s ${sdkVersion} -m ${msBuildVersion} -o ${architecture} --sha ${gitCommit}"
+				}
+			} // timeout
+		} // dir Tool/Scripts/build
+	} // nodejs
+	archiveArtifacts artifacts: 'dist/**/*'
+} // def build
 
-def unitTests(target, branch, testSuiteBranch, nodeVersion) {
+def unitTests(target, branch, testSuiteBranch, nodeVersion, npmVersion) {
 	def defaultEmulatorID = '10-0-1'
-	// unarchive mapping: ['dist/' : '.'] // copy in built SDK from dist/ folder (from Build stage)
+	unarchive mapping: ['dist/' : '.'] // copy in built SDK from dist/ folder (from Build stage)
 	unstash 'sources'
 	nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
-		// bat "npm install -g npm@${npmVersion}"
+		bat "npm install -g npm@${npmVersion}"
 		def nodeHome = tool(name: "node ${nodeVersion}", type: 'nodejs')
 		echo nodeHome
 		bat "netsh advfirewall firewall add rule name=\"Node ${nodeVersion}\" program=\"${nodeHome}\\node.exe\" dir=in action=allow protocol=udp description=\"Firewall rule\""
@@ -67,17 +67,17 @@ def unitTests(target, branch, testSuiteBranch, nodeVersion) {
 			// TODO Do a shallow clone, using same credentials as from scm object
 			git changelog: false, poll: false, credentialsId: 'd05dad3c-d7f9-4c65-9cb6-19fef98fc440', url: 'https://github.com/appcelerator/titanium-mobile-mocha-suite.git', branch: testSuiteBranch
 		}
-		// unstash 'override-tests'
-		// bat '(robocopy tests titanium-mobile-mocha-suite /e) ^& IF %ERRORLEVEL% LEQ 3 cmd /c exit 0'
+		unstash 'override-tests'
+		bat '(robocopy tests titanium-mobile-mocha-suite /e) ^& IF %ERRORLEVEL% LEQ 3 cmd /c exit 0'
 		dir('titanium-mobile-mocha-suite/scripts') {
 			bat 'npm install .'
 			echo "Running tests on ${target}"
 			try {
-				timeout(10) {
+				timeout(30) {
 					if ('ws-local'.equals(target)) {
 						bat "node test.js -p windows -T ${target} --skip-sdk-install --cleanup"
 					} else if ('wp-emulator'.equals(target)) {
-						bat "node test.js -p windows -T ${target} -C ${defaultEmulatorID}"
+						bat "node test.js -p windows -T ${target} -C ${defaultEmulatorID} --skip-sdk-install --cleanup"
 					}
 				}
 			} catch (e) {
@@ -128,35 +128,35 @@ timestamps {
 			stash name: 'override-tests', includes: 'tests/'
 		} // Checkout stage
 
-		// stage('Docs') {
-		// 	if (isUnix()) {
-		// 		sh 'mkdir -p dist/windows/doc'
-		// 	} else {
-		// 		bat 'mkdir dist\\\\windows\\\\doc'
-		// 	}
-		// 	echo 'Generating docs'
+		stage('Docs') {
+			if (isUnix()) {
+				sh 'mkdir -p dist/windows/doc'
+			} else {
+				bat 'mkdir dist\\\\windows\\\\doc'
+			}
+			echo 'Generating docs'
 
-		// 	nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
-		// 		dir('apidoc') {
-		// 			if (isUnix()) {
-		// 				sh 'npm install -g npm@5.7.1'
-		// 				sh 'npm install .'
-		// 				sh 'node ti_win_yaml.js'
-		// 			} else {
-		// 				bat "npm install -g npm@${npmVersion}"
-		// 				bat 'npm install .'
-		// 				bat 'node ti_win_yaml.js'
-		// 			}
-		// 		}
-		// 	}
-		// 	echo 'copying generated docs to dist folder'
-		// 	if (isUnix()) {
-		// 		sh 'mv apidoc/Titanium dist/windows/doc/Titanium'
-		// 	} else {
-		// 		bat '(robocopy apidoc\\\\Titanium dist\\\\windows\\\\doc\\\\Titanium /e) ^& IF %ERRORLEVEL% LEQ 3 cmd /c exit 0'
-		// 	}
-		// 	archiveArtifacts artifacts: 'dist/**/*'
-		// } // stage('Docs')
+			nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
+				dir('apidoc') {
+					if (isUnix()) {
+						sh "npm install -g npm@${npmVersion}"
+						sh 'npm install .'
+						sh 'node ti_win_yaml.js'
+					} else {
+						bat "call npm install -g npm@${npmVersion}"
+						bat 'call npm install .'
+						bat 'call node ti_win_yaml.js'
+					}
+				}
+			}
+			echo 'copying generated docs to dist folder'
+			if (isUnix()) {
+				sh 'mv apidoc/Titanium dist/windows/doc/Titanium'
+			} else {
+				bat '(robocopy apidoc\\\\Titanium dist\\\\windows\\\\doc\\\\Titanium /e) ^& IF %ERRORLEVEL% LEQ 3 cmd /c exit 0'
+			}
+			archiveArtifacts artifacts: 'dist/**/*'
+		} // stage('Docs')
 	} // node
 
 	// Are we on a PR/feature branch, or a "mainline" branch like master/6_2_X/7_0_X?
@@ -171,33 +171,33 @@ timestamps {
 	// Trigger titanium_mobile if we're on a mainline branch
 	def triggerDownstream = isMainlineBranch
 
-	// stage('Build') {
-	// 	parallel(
-	// 		'Windows 10 x86': {
-	// 			node('msbuild-14 && vs2015 && windows-sdk-10 && node && npm && cmake && jsc') {
-	// 				build('10.0', '14.0', 'WindowsStore-x86', gitCommit, nodeVersion)
-	// 			}
-	// 		},
-	// 		'Windows 10 ARM': {
-	// 			node('msbuild-14 && vs2015 && windows-sdk-10 && node && npm && cmake && jsc') {
-	// 				build('10.0', '14.0', 'WindowsStore-ARM', gitCommit, nodeVersion)
-	// 			}
-	// 		},
-	// 		failFast: true
-	// 	)
-	// } // Stage build
+	stage('Build') {
+		parallel(
+			'Windows 10 x86': {
+				node('msbuild-14 && vs2015 && windows-sdk-10 && node && npm && cmake && jsc') {
+					build('10.0', '14.0', 'WindowsStore-x86', gitCommit, nodeVersion, npmVersion)
+				}
+			},
+			'Windows 10 ARM': {
+				node('msbuild-14 && vs2015 && windows-sdk-10 && node && npm && cmake && jsc') {
+					build('10.0', '14.0', 'WindowsStore-ARM', gitCommit, nodeVersion, npmVersion)
+				}
+			},
+			failFast: true
+		)
+	} // Stage build
 
 	stage('Test') {
 		def testSuiteBranch = targetBranch
 		parallel(
-			// 'ws-local': {
-			// 	node('msbuild-14 && vs2015 && windows-sdk-10 && cmake && node && npm') {
-			// 		unitTests('ws-local', targetBranch, testSuiteBranch, nodeVersion)
-			// 	}
-			// },
+			'ws-local': {
+				node('msbuild-14 && vs2015 && windows-sdk-10 && cmake && node && npm') {
+					unitTests('ws-local', targetBranch, testSuiteBranch, nodeVersion, npmVersion)
+				}
+			},
 			'wp-emulator': {
 				node('msbuild-14 && vs2015 && hyper-v && windows-sdk-10 && cmake && node && npm') {
-					unitTests('wp-emulator', targetBranch, testSuiteBranch, nodeVersion)
+					unitTests('wp-emulator', targetBranch, testSuiteBranch, nodeVersion, npmVersion)
 				}
 			}
 		)
