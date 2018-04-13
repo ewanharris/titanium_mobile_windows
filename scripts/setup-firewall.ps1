@@ -18,7 +18,7 @@ Write-Host "Node version is " $nodeVersion
 
 $ruleName = "Node $($nodeVersion) UDP"
 
-$existingRule = Get-NetFirewallRule -DisplayName $ruleName
+$existingRule = Get-NetFirewallRule -DisplayName $ruleName -ErrorAction SilentlyContinue
 
 if ($existingRule.length -ne 0)
 {
@@ -26,8 +26,8 @@ if ($existingRule.length -ne 0)
     Remove-NetFirewallRule -DisplayName $ruleName
 }
 
-Write-Host "Running New-NetFirewallRule with args -DisplayName $($ruleName) -Direction Inbound  -Protocol UDP -Action Allow -Program $($nodeExe)"
-New-NetFirewallRule -DisplayName $ruleName -Direction Inbound  -Protocol UDP -Action Allow -Program $nodeExe
+Write-Host "Running New-NetFirewallRule with args -DisplayName $($ruleName) -Direction Inbound  -Protocol UDP -Action Allow -EdgeTraversalPolicy Allow -Program $($nodeExe)"
+New-NetFirewallRule -DisplayName $ruleName -Direction Inbound  -Protocol UDP -Action Allow -EdgeTraversalPolicy Allow -Program $nodeExe
  
 $ruleInfo = Get-NetFirewallRule -DisplayName $ruleName | Get-NetFirewallApplicationFilter
 Write-Host $ruleInfo.AppPath
