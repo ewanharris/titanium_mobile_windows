@@ -50,10 +50,10 @@ def unitTests(target, branch, testSuiteBranch, nodeVersion) {
 		// bat "npm install -g npm@${npmVersion}"
 		def nodeHome = tool(name: "node ${nodeVersion}", type: 'nodejs')
 		echo nodeHome
-		bat "netsh advfirewall firewall add rule name=\"Node ${nodeVersion} TCP\" program=\"${nodeHome}\\node.exe\" dir=in action=allow protocol=TCP"
-		bat "netsh advfirewall firewall add rule name=\"Node ${nodeVersion} UDP\" program=\"${nodeHome}\\node.exe\" dir=in action=allow protocol=UDP"
-		bat "netsh advfirewall firewall show rule name=\"Node ${nodeVersion} UDP\""
-		bat "netsh advfirewall firewall show rule name=\"Node ${nodeVersion} TCP\""
+		bat "netsh advfirewall firewall add rule name=\"Node ${nodeVersion} All\" program=\"${nodeHome}\\node.exe\" dir=in action=allow"
+		// bat "netsh advfirewall firewall add rule name=\"Node ${nodeVersion} UDP\" program=\"${nodeHome}\\node.exe\" dir=in action=allow"
+		// bat "netsh advfirewall firewall show rule name=\"Node ${nodeVersion} UDP\""
+		bat "netsh advfirewall firewall show rule name=\"Node ${nodeVersion} All\""
 		dir('Tools/Scripts/build') {
 			echo 'Setting up SDK'
 			bat 'npm install .'
