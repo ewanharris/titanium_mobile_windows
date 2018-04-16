@@ -1,4 +1,5 @@
-#!groovy​
+#!groovy
+library 'pipeline-library'
 // Keep history of up to 30 builds, but only keep artifacts for the last 5
 properties([buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: '5'))])
 
@@ -17,7 +18,7 @@ def build(sdkVersion, msBuildVersion, architecture, gitCommit, nodeVersion, npmV
 	bat 'mkdir dist\\windows'
 
 	nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
-		bat "npm install -g npm@${npmVersion}"
+		ensureNPM(npmVersion)
 		dir('Tools/Scripts') {
 			bat 'npm install .'
 			echo "Installing JSC built for Windows ${sdkVersion}"
@@ -47,7 +48,7 @@ def unitTests(target, branch, testSuiteBranch, nodeVersion, npmVersion) {
 	unarchive mapping: ['dist/' : '.'] // copy in built SDK from dist/ folder (from Build stage)
 	unstash 'sources'
 	nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
-		bat "npm install -g npm@${npmVersion}"
+		ensureNPM(npmVersion)
 		def nodeHome = tool(name: "node ${nodeVersion}", type: 'nodejs')
 		echo nodeHome
 		bat "netsh advfirewall firewall add rule name=\"Node ${nodeVersion}\" program=\"${nodeHome}\\node.exe\" dir=in action=allow protocol=udp description=\"Firewall rule\""
@@ -137,13 +138,12 @@ timestamps {
 			echo 'Generating docs'
 
 			nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
+				ensureNPM(npmVersion)
 				dir('apidoc') {
 					if (isUnix()) {
-						sh "npm install -g npm@${npmVersion}"
 						sh 'npm install .'
 						sh 'node ti_win_yaml.js'
 					} else {
-						bat "call npm install -g npm@${npmVersion}"
 						bat 'call npm install .'
 						bat 'call node ti_win_yaml.js'
 					}
@@ -174,12 +174,12 @@ timestamps {
 	stage('Build') {
 		parallel(
 			'Windows 10 x86': {
-				node('msbuild-14 && vs2015 && windows-sdk-10 && node && npm && cmake && jsc') {
+				node('msbuild-14 && vs2015 && windows-sdk-10 && cmake && jsc') {
 					build('10.0', '14.0', 'WindowsStore-x86', gitCommit, nodeVersion, npmVersion)
 				}
 			},
 			'Windows 10 ARM': {
-				node('msbuild-14 && vs2015 && windows-sdk-10 && node && npm && cmake && jsc') {
+				node('msbuild-14 && vs2015 && windows-sdk-10 && cmake && jsc') {
 					build('10.0', '14.0', 'WindowsStore-ARM', gitCommit, nodeVersion, npmVersion)
 				}
 			},
@@ -191,12 +191,12 @@ timestamps {
 		def testSuiteBranch = targetBranch
 		parallel(
 			'ws-local': {
-				node('msbuild-14 && vs2015 && windows-sdk-10 && cmake && node && npm') {
+				node('msbuild-14 && vs2015 && windows-sdk-10 && cmake') {
 					unitTests('ws-local', targetBranch, testSuiteBranch, nodeVersion, npmVersion)
 				}
 			},
 			'wp-emulator': {
-				node('msbuild-14 && vs2015 && hyper-v && windows-sdk-10 && cmake && node && npm') {
+				node('msbuild-14 && vs2015 && hyper-v && windows-sdk-10 && cmake') {
 					unitTests('wp-emulator', targetBranch, testSuiteBranch, nodeVersion, npmVersion)
 				}
 			}
