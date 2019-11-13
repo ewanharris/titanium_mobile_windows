@@ -589,9 +589,11 @@ function copyResources(next) {
 			.then(() => {
 
 				const tasks = copyUnmodified.map(relPath => {
-					const from = jsFiles[relPath];
-					const to = path.join(this.buildTargetAssetsDir, relPath);
-					copyFile.call(this, from, to, next);
+					return next => {
+						const from = jsFiles[relPath];
+						const to = path.join(this.buildTargetAssetsDir, relPath);
+						copyFile.call(this, from, to, next);
+					}
 				});
 
 				appc.async.parallel(this, tasks, () => {
